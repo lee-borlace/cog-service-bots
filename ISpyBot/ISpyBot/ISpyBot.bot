@@ -17,9 +17,17 @@
             "tenantId": "bc917ae2-1e64-468b-9367-74ed111ac098",
             "subscriptionId": "801f812f-16a0-4e91-9c9c-709865385c7b",
             "resourceGroup": "cog-service-bot-lee",
-            "connectionString": "GjiVGkiG4SnI/gTna0Lv7Q==!z2VixAXBW712lbNmuu03EwXRJEw/sXja16fy90yzi3ukWzExmXIrEeKMDU9eouwjNhLIYrQ1TUmurvZIyPEuMOoUmeslf58+yx/PR97soTZxbvmxxpuTkmi7+HvsFNAlKZpq21icVT4oUwo6EIJG6OZiztfXjFSG5KAt0FyUq4eWWd2qF6ADE2xRO3QMLCrlmAaZMts+S6mi3X7Mh5g1rKAncOE81umAENG4q04V4lAzo4pyjadbn4u4E1N3R4cY5/qDfnQhYNoT1dud5nH7+A==",
+            "connectionString": "kFmCA4Fsy+hZtsjquxko3w==!asRazekBMrBRv/p2lNHTYBHxuOahQBZ++Gedge8roZ56uHG/GvLhDixrYqjyaeIERSBPP1ElT5aiZCHynuQF9tVJyU7dhvmJvigoUfrsMNl92o9/Qb49g5681/27DLOeiaqGCXYN3hCNWkNDkhnUFAQupN02KGORPnTqyh7kRyhNg9sEkqLH1Z1FdZhuSiTGHeoAdH8UEF9zRHs1vPQyfB3DcChB6pxsau18M6NSoaKhoJW9LGjSCsqOAuUDhCzH1GEc2HOUgU/C7//WFWaEcg==",
             "container": "bot-state-ispybot",
             "id": "159"
+        },
+        {
+            "type": "endpoint",
+            "name": "production",
+            "appId": "37606d1d-0b87-425d-913d-a0c61adeb548",
+            "appPassword": "FWrQC5qEEbchyDKO6MquAQ==!NkXnTgcQVT6nXy7YnaPRmZfhwTDGybj3LZuJ5ArmIy0=",
+            "endpoint": "https://ispybot.azurewebsites.net/api/messages",
+            "id": "9"
         }
     ],
     "padlock": "BfpCmm2ryqsVM/AIBuByCw==!Vmfsy8DD/q727/poj5V+pdPvj27g54euIFGyIMTWeCqWQfOPlrKEWJs7pEbxfIFp",
