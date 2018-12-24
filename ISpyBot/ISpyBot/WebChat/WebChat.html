@@ -1,0 +1,21 @@
+﻿<link href="botchat.css" rel="stylesheet" />
+<div id="bot" />
+<script src="botchat.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+<script>$.post(
+        "/api/token/index",
+        {},
+        function (data) {
+            BotChat.App({
+                directLine: {
+                    secret: data.Token
+                },
+                user: { id: data.UserId },
+                bot: { id: 'botid' },
+                resize: 'detect'
+            }, document.getElementById("bot"));
+        }
+    );</script>

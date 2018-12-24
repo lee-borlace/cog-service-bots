@@ -1,15 +1,27 @@
-﻿{
-  "name": "ISpyBot",
-  "services": [
-    {
-      "type": "endpoint",
-      "name": "development",
-      "endpoint": "http://localhost:3978/api/messages",
-      "appId": "",
-      "appPassword": "",
-      "id": "1"
-    }
-  ],
-  "padlock": "",
-  "version": "2.0"
+{
+    "name": "ISpyBot",
+    "description": "",
+    "services": [
+        {
+            "type": "endpoint",
+            "name": "development",
+            "endpoint": "http://localhost:3978/api/messages",
+            "appId": "",
+            "appPassword": "",
+            "id": "1"
+        },
+        {
+            "type": "blob",
+            "name": "BotStateBlob",
+            "serviceName": "BotStateBlob",
+            "tenantId": "bc917ae2-1e64-468b-9367-74ed111ac098",
+            "subscriptionId": "801f812f-16a0-4e91-9c9c-709865385c7b",
+            "resourceGroup": "cog-service-bot-lee",
+            "connectionString": "GjiVGkiG4SnI/gTna0Lv7Q==!z2VixAXBW712lbNmuu03EwXRJEw/sXja16fy90yzi3ukWzExmXIrEeKMDU9eouwjNhLIYrQ1TUmurvZIyPEuMOoUmeslf58+yx/PR97soTZxbvmxxpuTkmi7+HvsFNAlKZpq21icVT4oUwo6EIJG6OZiztfXjFSG5KAt0FyUq4eWWd2qF6ADE2xRO3QMLCrlmAaZMts+S6mi3X7Mh5g1rKAncOE81umAENG4q04V4lAzo4pyjadbn4u4E1N3R4cY5/qDfnQhYNoT1dud5nH7+A==",
+            "container": "bot-state-ispybot",
+            "id": "159"
+        }
+    ],
+    "padlock": "BfpCmm2ryqsVM/AIBuByCw==!Vmfsy8DD/q727/poj5V+pdPvj27g54euIFGyIMTWeCqWQfOPlrKEWJs7pEbxfIFp",
+    "version": "2.0"
 }

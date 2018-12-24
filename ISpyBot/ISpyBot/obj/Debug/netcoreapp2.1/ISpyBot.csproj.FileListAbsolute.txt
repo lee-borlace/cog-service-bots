@@ -1,0 +1,13 @@
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\bin\Debug\netcoreapp2.1\ISpyBot.bot
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\bin\Debug\netcoreapp2.1\ISpyBot.deps.json
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\bin\Debug\netcoreapp2.1\ISpyBot.runtimeconfig.json
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\bin\Debug\netcoreapp2.1\ISpyBot.runtimeconfig.dev.json
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\bin\Debug\netcoreapp2.1\ISpyBot.dll
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\bin\Debug\netcoreapp2.1\ISpyBot.pdb
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\obj\Debug\netcoreapp2.1\ISpyBot.csprojAssemblyReference.cache
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\obj\Debug\netcoreapp2.1\ISpyBot.csproj.CoreCompileInputs.cache
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\obj\Debug\netcoreapp2.1\ISpyBot.AssemblyInfoInputs.cache
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\obj\Debug\netcoreapp2.1\ISpyBot.AssemblyInfo.cs
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\obj\Debug\netcoreapp2.1\ISpyBot.dll
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\obj\Debug\netcoreapp2.1\ISpyBot.pdb
+C:\Users\Lee\source\repos\github\leeroy79\cog-service-bots\ISpyBot\ISpyBot\obj\Debug\netcoreapp2.1\UserSecretsAssemblyInfo.cs
