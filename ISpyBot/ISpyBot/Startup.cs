@@ -65,6 +65,8 @@ namespace ISpyBot
             services.AddOptions();
 
             services.Configure<BotAuthConfig>(Configuration.GetSection("BotAuth"));
+            services.Configure<SpeechConfig>(Configuration.GetSection("Speech"));
+            services.Configure<VisionConfig>(Configuration.GetSection("Vision"));
 
             services.AddBot<ISpyBotBot>(options =>
             {
