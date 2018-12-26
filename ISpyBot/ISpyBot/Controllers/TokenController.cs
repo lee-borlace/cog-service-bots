@@ -5,8 +5,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using ISpyBot.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Connector;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace ISpyBot.Controllers
@@ -15,16 +17,22 @@ namespace ISpyBot.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
-        [HttpPost]
-        public async Task<ActionResult<ChatConfig>> Index()
+        private string _directLineSecret;
+
+        public TokenController(IOptions<BotAuthConfig> options)
         {
-            var secret = ConfigurationManager.AppSettings["Bot:DirectLineSecret"];
+            _directLineSecret = options.Value.DirectLineSecret;
+        }
+
+        [HttpPost]
+        public async Task<ChatConfig> Post()
+        {
             HttpClient client = new HttpClient();
 
             HttpRequestMessage request = new HttpRequestMessage(
                 HttpMethod.Post,
                 $" https://directline.botframework.com/v3/directline/tokens/generate");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", secret);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _directLineSecret);
             var userId = $"dl_{Guid.NewGuid()}";
 
             request.Content = new StringContent(

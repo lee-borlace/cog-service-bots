@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using ISpyBot.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Serialization;
 
 namespace ISpyBot
 {
@@ -60,7 +62,9 @@ namespace ISpyBot
         /// <seealso cref="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-manage-channels?view=azure-bot-service-4.0"/>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
 
+            services.Configure<BotAuthConfig>(Configuration.GetSection("BotAuth"));
 
             services.AddBot<ISpyBotBot>(options =>
             {
@@ -148,7 +152,9 @@ namespace ISpyBot
                return accessors;
            });
 
-           services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+           services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
