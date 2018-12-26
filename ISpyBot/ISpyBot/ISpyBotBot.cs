@@ -76,8 +76,8 @@ namespace ISpyBot
                 await _accessors.ConversationState.SaveChangesAsync(turnContext);
 
                 // Echo back to the user whatever they typed.
-                var responseMessage = $"Turn {state.TurnCount}: You sent '{turnContext.Activity.Text}'\n";
-                await turnContext.SendActivityAsync(responseMessage);
+                var responseMessage = $"You sent '{turnContext.Activity.Text}'";
+                await turnContext.SendActivityAsync(responseMessage, speak: responseMessage, inputHint:"acceptingInput");
             }
             else
             {
