@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
@@ -59,6 +60,8 @@ namespace ISpyBot
         /// <seealso cref="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-manage-channels?view=azure-bot-service-4.0"/>
         public void ConfigureServices(IServiceCollection services)
         {
+
+
             services.AddBot<ISpyBotBot>(options =>
             {
                 var secretKey = Configuration.GetSection("botFileSecret")?.Value;
@@ -144,6 +147,8 @@ namespace ISpyBot
 
                return accessors;
            });
+
+           services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -153,6 +158,10 @@ namespace ISpyBot
             app.UseDefaultFiles()
                 .UseStaticFiles()
                 .UseBotFramework();
+
+            app.UseHttpsRedirection();
+
+            app.UseMvc();
         }
     }
 }

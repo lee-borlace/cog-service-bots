@@ -11,9 +11,12 @@ using Newtonsoft.Json;
 
 namespace ISpyBot.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class TokenController : ControllerBase
     {
-        public async Task<ChatConfig> Index()
+        [HttpPost]
+        public async Task<ActionResult<ChatConfig>> Index()
         {
             var secret = ConfigurationManager.AppSettings["Bot:DirectLineSecret"];
             HttpClient client = new HttpClient();
