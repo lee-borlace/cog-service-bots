@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Echo bot with counter sample</title>
+    <link href="botchat.css" rel="stylesheet" />
+    <script src="botchat.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script>
+
+        $.post(
+            "/api/directlinetoken",
+            {},
+            function (data) {
+                BotChat.App({
+                    directLine: {
+                        secret: data.Token
+                    },
+                    user: { id: data.UserId },
+                    bot: { id: 'botid' },
+                    resize: 'detect'
+                }, document.getElementById("bot"));
+            }
+        );</script>
+
+</head>
+
+<body>
+    <div id="bot" />
+</body>
+
+
+</html>

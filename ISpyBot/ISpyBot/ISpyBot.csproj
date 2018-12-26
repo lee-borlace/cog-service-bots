@@ -27,6 +27,6 @@
   <ItemGroup>
     <None Include="wwwroot\WebChat\botchat.css" />
     <None Include="wwwroot\WebChat\botchat.js" />
-    <None Include="wwwroot\WebChat\WebChat.html" />
+    <None Include="wwwroot\WebChat\WebChatV3.html" />
   </ItemGroup>
 </Project>

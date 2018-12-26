@@ -8,5 +8,7 @@ namespace ISpyBot.Configuration
     public class SpeechConfig
     {
         public string ApiKey { get; set; }
+
+        public string Region { get; set; }
     }
 }
