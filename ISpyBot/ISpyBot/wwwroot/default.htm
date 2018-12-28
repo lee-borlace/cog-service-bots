@@ -4,12 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>I Spy Bot</title>
-    <!-- Cognitive Services Speech Services adapter is only available in full bundle -->
-    <!--
-      For demonstration purpose, we are using development branch of Web Chat at "/master/webchat.js".
-      When you are using Web Chat for production, you should use the latest stable at "/latest/webchat.js".
-      Or locked down on a specific version "/4.1.0/webchat.js".
-    -->
     <script src="webchat.js"></script>
     <style>
         html, body {
@@ -31,40 +25,25 @@
     <div id="webchat" role="main"></div>
     <script>
 
+        (async function () {
 
+            var res = await fetch('/api/directlinetoken', { method: 'POST' });
+            var resultObject = await res.json();
+            var directLineToken = resultObject.Token;
+            res = await fetch('/api/speechtoken', { method: 'POST' });
+            resultObject = await res.json();
+            region = resultObject.Region;
+            var speechToken = resultObject.Token;
+            var webSpeechPonyfillFactory = await window.WebChat.createCognitiveServicesSpeechServicesPonyfillFactory({ authorizationToken: speechToken, region: region });
 
-        let directLineToken;
-        let region;
-        let speechToken;
+            window.WebChat.renderWebChat({
+                directLine: window.WebChat.createDirectLine({ token: directLineToken }),
+                webSpeechPonyfillFactory
+            }, document.getElementById('webchat'));
 
-        fetch('/api/directlinetoken', { method: 'POST' })
-            .then(function (res) {
-                return res.json();
-            })
-            .then(function (resultObject) {
-                directLineToken = resultObject.Token;
-                return fetch('/api/speechtoken', { method: 'POST' });
-            })
-            .then(function (res) {
-                return res.json();
-            })
-            .then(function (resultObject) {
-                region = resultObject.Region;
-                speechToken = resultObject.Token;
-                return window.WebChat.createCognitiveServicesSpeechServicesPonyfillFactory({ authorizationToken: speechToken, region: region });
-            })
-            .then(function (webSpeechPonyfillFactory) {
+            document.querySelector('#webchat > *').focus();
 
-                // Pass a Web Speech ponyfill factory to renderWebChat.
-                // You can also use your own speech engine given it is compliant to W3C Web Speech API, https://w3c.github.io/speech-api/.
-                // For implementor, look at createBrowserWebSpeechPonyfill.js for details.
-                window.WebChat.renderWebChat({
-                    directLine: window.WebChat.createDirectLine({ token: directLineToken }),
-                    webSpeechPonyfillFactory
-                }, document.getElementById('webchat'));
-
-                document.querySelector('#webchat > *').focus();
-            });
+        })().catch(err => console.error(err));
 
 
     </script>
