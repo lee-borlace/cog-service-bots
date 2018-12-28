@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ISpyBot.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using Microsoft.Extensions.Options;
 
 namespace ISpyBot.Controllers
 {
@@ -12,13 +16,30 @@ namespace ISpyBot.Controllers
     [ApiController]
     public class VisionController : ControllerBase
     {
-        [HttpPost("analyse")]
-        public async Task<string> Analyse()
-        {
-            var reader = new StreamReader(Request.Body);
-            var image = reader.ReadToEnd();
+        private VisionConfig _config;
+        private ComputerVisionClient _visionClient;
 
-            return "";
+        private static readonly List<VisualFeatureTypes> Features =
+            new List<VisualFeatureTypes>()
+        {
+            VisualFeatureTypes.Tags
+        };
+
+        public VisionController(IOptions<VisionConfig> options)
+        {
+            _config = options.Value;
+
+            _visionClient = new ComputerVisionClient(
+                new ApiKeyServiceClientCredentials(_config.ApiKey),
+                new System.Net.Http.DelegatingHandler[] { });
+
+            _visionClient.Endpoint = $"https://{_config.Region}.api.cognitive.microsoft.com";
+        }
+
+        [HttpPost("analyse")]
+        public async Task<ImageAnalysis> Analyse()
+        {
+            return await _visionClient.AnalyzeImageInStreamAsync(Request.Body, Features);
         }
     }
 }

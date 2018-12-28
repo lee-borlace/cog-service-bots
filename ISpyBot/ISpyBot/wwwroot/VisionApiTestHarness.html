@@ -12,8 +12,8 @@
 
             const constraints = {
                 video: {
-                    width: { exact: 320 },
-                    height: { exact: 240 }
+                    width: { exact: 640 },
+                    height: { exact: 480 }
                 }
             };
 
@@ -72,8 +72,6 @@
 
                     type: "POST",
 
-                    
-
                     // Request body.
                     data: makeblob(dataUrl)
                 })
@@ -128,7 +126,7 @@
     <div id="basic" style="text-align:center;">
         <video class="videostream" autoplay></video>
         <p>
-            <button class="process-faces" onclick="VisionApiTestHarness.processImage()">Process faces</button>
+            <button class="process-faces" onclick="VisionApiTestHarness.processImage()">Analyse Image</button>
         </p>
     </div>
 
