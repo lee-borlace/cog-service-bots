@@ -62,21 +62,22 @@ namespace ISpyBot
         /// <seealso cref="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-manage-channels?view=azure-bot-service-4.0"/>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOptions();
+            var secretKey = Configuration.GetSection("botFileSecret")?.Value;
+            var botFilePath = Configuration.GetSection("botFilePath")?.Value;
+            var botConfig = BotConfiguration.Load(botFilePath ?? @".\ISpyBot.bot", secretKey);
+            services.AddSingleton(sp => botConfig ?? throw new InvalidOperationException($"The .bot config file could not be loaded. ({botConfig})"));
 
+            services.AddOptions();
             services.Configure<BotAuthConfig>(Configuration.GetSection("BotAuth"));
             services.Configure<SpeechConfig>(Configuration.GetSection("Speech"));
             services.Configure<VisionConfig>(Configuration.GetSection("Vision"));
 
+            var conversationState = GetBlobConversationState(botConfig);
+            services.AddSingleton(conversationState);
+            services.AddSingleton(new BotStateSet(conversationState));
+
             services.AddBot<ISpyBotBot>(options =>
             {
-                var secretKey = Configuration.GetSection("botFileSecret")?.Value;
-                var botFilePath = Configuration.GetSection("botFilePath")?.Value;
-
-                // Loads .bot configuration file and adds a singleton that your Bot can access through dependency injection.
-                var botConfig = BotConfiguration.Load(botFilePath ?? @".\ISpyBot.bot", secretKey);
-                services.AddSingleton(sp => botConfig ?? throw new InvalidOperationException($"The .bot config file could not be loaded. ({botConfig})"));
-
                 // Retrieve current endpoint.
                 var environment = _isProduction ? "production" : "development";
                 var service = botConfig.Services.FirstOrDefault(s => s.Type == "endpoint" && s.Name == environment);
@@ -97,66 +98,61 @@ namespace ISpyBot
                     await context.SendActivityAsync("Sorry, it looks like something went wrong.");
                 };
 
-                // The Memory Storage used here is for local bot debugging only. When the bot
-                // is restarted, everything stored in memory will be gone.
-                // IStorage dataStore = new MemoryStorage();
-
-                // For production bots use the Azure Blob or
-                // Azure CosmosDB storage providers. For the Azure
-                // based storage providers, add the Microsoft.Bot.Builder.Azure
-                // Nuget package to your solution. That package is found at:
-                // https://www.nuget.org/packages/Microsoft.Bot.Builder.Azure/
-                // Uncomment the following lines to use Azure Blob Storage
-                // //Storage configuration name or ID from the .bot file.
-
-                const string StorageConfigurationId = "BotStateBlob";
-                var blobConfig = botConfig.FindServiceByNameOrId(StorageConfigurationId);
-                if (!(blobConfig is BlobStorageService blobStorageConfig))
-                {
-                    throw new InvalidOperationException($"The .bot file does not contain an blob storage with name '{StorageConfigurationId}'.");
-                }
-                // Default container name.
-                const string DefaultBotContainer = "bot-state-ispybot";
-                var storageContainer = string.IsNullOrWhiteSpace(blobStorageConfig.Container) ? DefaultBotContainer : blobStorageConfig.Container;
-                IStorage dataStore = new Microsoft.Bot.Builder.Azure.AzureBlobStorage(blobStorageConfig.ConnectionString, storageContainer);
-
-                // Create Conversation State object.
-                // The Conversation State object is where we persist anything at the conversation-scope.
-                var conversationState = new ConversationState(dataStore);
-
-                options.State.Add(conversationState);
+                options.Middleware.Add(new AutoSaveStateMiddleware(conversationState));
             });
 
-            // Create and register state accessors.
-            // Accessors created here are passed into the IBot-derived class on every turn.
-            services.AddSingleton<ISpyBotAccessors>(sp =>
-           {
-               var options = sp.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
-               if (options == null)
-               {
-                   throw new InvalidOperationException("BotFrameworkOptions must be configured prior to setting up the state accessors");
-               }
+            //// Create and register state accessors.
+            //// Accessors created here are passed into the IBot-derived class on every turn.
+            //services.AddSingleton<ISpyBotAccessors>(sp =>
+            //{
+            //    var options = sp.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
+            //    if (options == null)
+            //    {
+            //        throw new InvalidOperationException("BotFrameworkOptions must be configured prior to setting up the state accessors");
+            //    }
 
-               var conversationState = options.State.OfType<ConversationState>().FirstOrDefault();
+            //    var conversationState = options.State.OfType<ConversationState>().FirstOrDefault();
 
-               if (conversationState == null)
-               {
-                   throw new InvalidOperationException("ConversationState must be defined and added before adding conversation-scoped state accessors.");
-               }
+            //    if (conversationState == null)
+            //    {
+            //        throw new InvalidOperationException("ConversationState must be defined and added before adding conversation-scoped state accessors.");
+            //    }
 
-               // Create the custom state accessor.
-               // State accessors enable other components to read and write individual properties of state.
-               var accessors = new ISpyBotAccessors(conversationState)
-               {
-                   CounterState = conversationState.CreateProperty<CounterState>(ISpyBotAccessors.CounterStateName),
-               };
+            //   // Create the custom state accessor.
+            //   // State accessors enable other components to read and write individual properties of state.
+            //   var accessors = new ISpyBotAccessors(conversationState)
+            //    {
+            //        CounterState = conversationState.CreateProperty<CounterState>(ISpyBotAccessors.CounterStateName),
+            //    };
 
-               return accessors;
-           });
+            //    return accessors;
+            //});
 
-           services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+            services.AddMvc()
+                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+        }
+
+        private static ConversationState GetBlobConversationState(BotConfiguration botConfig)
+        {
+            IStorage dataStore = GetBlobDataStore(botConfig);
+            var conversationState = new ConversationState(dataStore);
+            return conversationState;
+        }
+
+        private static IStorage GetBlobDataStore(BotConfiguration botConfig)
+        {
+            const string StorageConfigurationId = "BotStateBlob";
+            var blobConfig = botConfig.FindServiceByNameOrId(StorageConfigurationId);
+            if (!(blobConfig is BlobStorageService blobStorageConfig))
+            {
+                throw new InvalidOperationException($"The .bot file does not contain an blob storage with name '{StorageConfigurationId}'.");
+            }
+            // Default container name.
+            const string DefaultBotContainer = "bot-state-ispybot";
+            var storageContainer = string.IsNullOrWhiteSpace(blobStorageConfig.Container) ? DefaultBotContainer : blobStorageConfig.Container;
+            IStorage dataStore = new Microsoft.Bot.Builder.Azure.AzureBlobStorage(blobStorageConfig.ConnectionString, storageContainer);
+            return dataStore;
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

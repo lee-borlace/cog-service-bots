@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
@@ -22,25 +23,19 @@ namespace ISpyBot
     /// <seealso cref="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.1"/>
     public class ISpyBotBot : IBot
     {
-        private readonly ISpyBotAccessors _accessors;
         private readonly ILogger _logger;
+        private readonly ConversationState _conversationState;
 
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        /// <param name="accessors">A class containing <see cref="IStatePropertyAccessor{T}"/> used to manage state.</param>
-        /// <param name="loggerFactory">A <see cref="ILoggerFactory"/> that is hooked to the Azure App Service provider.</param>
-        /// <seealso cref="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.1#windows-eventlog-provider"/>
-        public ISpyBotBot(ISpyBotAccessors accessors, ILoggerFactory loggerFactory)
+        public ISpyBotBot(ConversationState conversationState, ILoggerFactory loggerFactory)
         {
             if (loggerFactory == null)
             {
                 throw new System.ArgumentNullException(nameof(loggerFactory));
             }
 
+            _conversationState = conversationState ?? throw new ArgumentNullException(nameof(conversationState));
             _logger = loggerFactory.CreateLogger<ISpyBotBot>();
             _logger.LogTrace("Turn start.");
-            _accessors = accessors ?? throw new System.ArgumentNullException(nameof(accessors));
         }
 
         /// <summary>
@@ -63,25 +58,9 @@ namespace ISpyBot
             // see https://aka.ms/about-bot-activity-message to learn more about the message and other activity types
             if (turnContext.Activity.Type == ActivityTypes.Message)
             {
-                // Get the conversation state from the turn context.
-                var state = await _accessors.CounterState.GetAsync(turnContext, () => new CounterState());
-
-                // Bump the turn count for this conversation.
-                state.TurnCount++;
-
-                // Set the property using the accessor.
-                await _accessors.CounterState.SetAsync(turnContext, state);
-
-                // Save the new turn count into the conversation state.
-                await _accessors.ConversationState.SaveChangesAsync(turnContext);
-
                 // Echo back to the user whatever they typed.
                 var responseMessage = $"You sent '{turnContext.Activity.Text}'";
                 await turnContext.SendActivityAsync(responseMessage, speak: responseMessage, inputHint:"acceptingInput");
-            }
-            else
-            {
-                await turnContext.SendActivityAsync($"{turnContext.Activity.Type} event detected");
             }
         }
     }
