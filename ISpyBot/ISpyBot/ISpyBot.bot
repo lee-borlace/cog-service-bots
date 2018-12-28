@@ -6,8 +6,8 @@
             "type": "endpoint",
             "name": "development",
             "endpoint": "http://localhost:3978/api/messages",
-            "appId": "",
-            "appPassword": "",
+            "appId": "69ba7088-e286-46ea-a67b-ee2eabe5d2af",
+            "appPassword": "9FMTYF1So5edgAMNlEMNvw==!tepJUqV60kjhfLa53tOsgVJkvwBrv7QdzgQuMR21k7U=",
             "id": "1"
         },
         {
@@ -17,7 +17,7 @@
             "tenantId": "bc917ae2-1e64-468b-9367-74ed111ac098",
             "subscriptionId": "801f812f-16a0-4e91-9c9c-709865385c7b",
             "resourceGroup": "cog-service-bot-lee",
-            "connectionString": "kFmCA4Fsy+hZtsjquxko3w==!asRazekBMrBRv/p2lNHTYBHxuOahQBZ++Gedge8roZ56uHG/GvLhDixrYqjyaeIERSBPP1ElT5aiZCHynuQF9tVJyU7dhvmJvigoUfrsMNl92o9/Qb49g5681/27DLOeiaqGCXYN3hCNWkNDkhnUFAQupN02KGORPnTqyh7kRyhNg9sEkqLH1Z1FdZhuSiTGHeoAdH8UEF9zRHs1vPQyfB3DcChB6pxsau18M6NSoaKhoJW9LGjSCsqOAuUDhCzH1GEc2HOUgU/C7//WFWaEcg==",
+            "connectionString": "no6RTiPAm8nyxcvgouF+KA==!8EEaJaIp4HDv9GKPaaV+uey3nnQHKqyKKK4Dv+gQRotTnN89Xi8ttuxqWQ3TrIu74qLP47Q/uXHfsItDLoqI5EG4OcFUh9oXGv4y4gul0eotwTyuKZJ/Gx+A0rl9n/c0S2fiyjJ6qSNfhUh7BfVDG1yjmjMBwc8cWhqufQ5K5v3Vv1G74rb9x2BThK3l7l/Kn/DckB0ZTqv8nxIUuvijsg04SkRSdK23kh8VrD+GL6N9N2vmrv6HqwUNhSdv0BU/eJ5OMOXf1nlMQQYjzOq4Fw==",
             "container": "bot-state-ispybot",
             "id": "159"
         },
@@ -25,11 +25,11 @@
             "type": "endpoint",
             "name": "production",
             "appId": "37606d1d-0b87-425d-913d-a0c61adeb548",
-            "appPassword": "FWrQC5qEEbchyDKO6MquAQ==!NkXnTgcQVT6nXy7YnaPRmZfhwTDGybj3LZuJ5ArmIy0=",
+            "appPassword": "f9sBNt6ghW7XULvVe+0/bQ==!kKNu2M9yU1vBEbVv/dv8SxtFoxbkcAO+2GQ12IU/Y48=",
             "endpoint": "https://ispybot.azurewebsites.net/api/messages",
             "id": "9"
         }
     ],
-    "padlock": "BfpCmm2ryqsVM/AIBuByCw==!Vmfsy8DD/q727/poj5V+pdPvj27g54euIFGyIMTWeCqWQfOPlrKEWJs7pEbxfIFp",
+    "padlock": "dnjKZ5luJ6IIxie4RNRbdA==!lkdSR59+v89V1S/eYLk4AJbGGISmwUPF4k8/yyQVx6mzBtPZW6ZxNm5I2QQas4AP",
     "version": "2.0"
 }
