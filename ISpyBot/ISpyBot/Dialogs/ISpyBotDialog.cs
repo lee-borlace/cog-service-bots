@@ -38,7 +38,7 @@ namespace ISpyBot.Dialogs
         /// <returns></returns>
         private static async Task<DialogTurnResult> StepConfirmPlayISpyAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(DialogNames.PromptConfirmPlayISpy, new PromptOptions { Prompt = MessageFactory.Text(Constants.Messages.PromptPlayISpy) }, cancellationToken);
+            return await stepContext.PromptAsync(DialogNames.PromptConfirmPlayISpy, new PromptOptions { Prompt = MessageFactory.Text(Constants.Messages.PromptPlayISpy, inputHint:Constants.InputHint.ExpectingInput) }, cancellationToken);
         }
 
         /// <summary>

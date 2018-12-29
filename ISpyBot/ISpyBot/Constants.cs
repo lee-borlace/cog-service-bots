@@ -16,5 +16,12 @@ namespace ISpyBot
             public const string ISpy = "I spy, with my little eye, something beginning with {0}.";
             public const string CouldntFindAnything = "Hmm, I'm having trouble seeing anything.";
         }
+
+        public class InputHint
+        {
+            public const string AcceptingInput = "acceptingInput";
+            public const string ExpectingInput = "expectingInput";
+            public const string IgnoringInput = "ignoringInput";
+        }
     }
 }
