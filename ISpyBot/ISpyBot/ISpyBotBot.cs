@@ -2,8 +2,10 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ISpyBot.Dialogs;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
@@ -37,34 +39,35 @@ namespace ISpyBot
 
             _accessors = accessors ?? throw new ArgumentNullException(nameof(_accessors));
             _logger = loggerFactory.CreateLogger<ISpyBotBot>();
-            _logger.LogTrace("Turn start.");
 
             _dialogs = new DialogSet(_accessors.DialogState);
+            ISpyBotDialog.InitialiseDialogSet(_dialogs);
         }
 
-        /// <summary>
-        /// Every conversation turn for our Echo Bot will call this method.
-        /// There are no dialogs used, since it's "single turn" processing, meaning a single
-        /// request and response.
-        /// </summary>
-        /// <param name="turnContext">A <see cref="ITurnContext"/> containing all the data needed
-        /// for processing this conversation turn. </param>
-        /// <param name="cancellationToken">(Optional) A <see cref="CancellationToken"/> that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A <see cref="Task"/> that represents the work queued to execute.</returns>
-        /// <seealso cref="BotStateSet"/>
-        /// <seealso cref="ConversationState"/>
-        /// <seealso cref="IMiddleware"/>
         public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
-            // Handle Message activity type, which is the main activity type for shown within a conversational interface
-            // Message activities may contain text, speech, interactive cards, and binary or unknown attachments.
-            // see https://aka.ms/about-bot-activity-message to learn more about the message and other activity types
-            if (turnContext.Activity.Type == ActivityTypes.Message)
+            var dialogContext = await _dialogs.CreateContextAsync(turnContext, cancellationToken);
+            var results = await dialogContext.ContinueDialogAsync(cancellationToken);
+
+            // Bot added to conversation. Kick off the main dialog.
+            if (turnContext.Activity.Type == ActivityTypes.ConversationUpdate)
             {
-                // Echo back to the user whatever they typed.
-                var responseMessage = $"You sent '{turnContext.Activity.Text}'";
-                await turnContext.SendActivityAsync(responseMessage, speak: responseMessage, inputHint:"acceptingInput");
+                if (turnContext.Activity.MembersAdded.Any())
+                {
+                    if (turnContext.Activity.MembersAdded.First().Id.Contains("bot", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await dialogContext.BeginDialogAsync(ISpyBotDialog.DialogNames.WaterfallMain, null, cancellationToken);
+                    }
+                }
+            }
+            // Message.
+            else if (turnContext.Activity.Type == ActivityTypes.Message)
+            {
+                // If the DialogTurnStatus is Empty we should start a new dialog.
+                if (results.Status == DialogTurnStatus.Empty)
+                {
+                    await dialogContext.BeginDialogAsync(ISpyBotDialog.DialogNames.WaterfallMain, null, cancellationToken);
+                }
             }
         }
     }
