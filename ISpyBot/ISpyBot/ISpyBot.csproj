@@ -16,6 +16,7 @@
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="3.3.0" />
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.2.0" />
     <PackageReference Include="Microsoft.Bot.Builder.Azure" Version="4.2.0" />
+    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.2.0" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.2.0" />
     <PackageReference Include="Microsoft.Bot.Configuration" Version="4.2.0" />
     <PackageReference Include="Microsoft.Bot.Connector" Version="4.2.0" />
@@ -23,5 +24,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Dialogs\" />
   </ItemGroup>
 </Project>

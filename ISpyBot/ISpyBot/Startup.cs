@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Integration;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Configuration;
@@ -72,9 +73,15 @@ namespace ISpyBot
             services.Configure<SpeechConfig>(Configuration.GetSection("Speech"));
             services.Configure<VisionConfig>(Configuration.GetSection("Vision"));
 
-            var conversationState = GetBlobConversationState(botConfig);
+            var dataStore = GetBlobDataStore(botConfig);
+
+            var conversationState = GetBlobConversationState(dataStore);
+            var userState = GetBlobUserState(dataStore);
+
             services.AddSingleton(conversationState);
-            services.AddSingleton(new BotStateSet(conversationState));
+            services.AddSingleton(userState);
+
+            services.AddSingleton(new BotStateSet(conversationState, userState));
 
             services.AddBot<ISpyBotBot>(options =>
             {
@@ -98,46 +105,35 @@ namespace ISpyBot
                     await context.SendActivityAsync("Sorry, it looks like something went wrong.");
                 };
 
-                options.Middleware.Add(new AutoSaveStateMiddleware(conversationState));
+                options.Middleware.Add(new AutoSaveStateMiddleware(conversationState, userState));
             });
 
-            //// Create and register state accessors.
-            //// Accessors created here are passed into the IBot-derived class on every turn.
-            //services.AddSingleton<ISpyBotAccessors>(sp =>
-            //{
-            //    var options = sp.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
-            //    if (options == null)
-            //    {
-            //        throw new InvalidOperationException("BotFrameworkOptions must be configured prior to setting up the state accessors");
-            //    }
+            services.AddSingleton<ISpyBotAccessors>(sp =>
+            {
+                var accessors = new ISpyBotAccessors(conversationState, userState)
+                {
+                    ConversationData = conversationState.CreateProperty<ConversationData>(ISpyBotAccessors.ConversationDataName),
+                    DialogState = conversationState.CreateProperty<DialogState>(ISpyBotAccessors.DialogStateName),
+                };
 
-            //    var conversationState = options.State.OfType<ConversationState>().FirstOrDefault();
-
-            //    if (conversationState == null)
-            //    {
-            //        throw new InvalidOperationException("ConversationState must be defined and added before adding conversation-scoped state accessors.");
-            //    }
-
-            //   // Create the custom state accessor.
-            //   // State accessors enable other components to read and write individual properties of state.
-            //   var accessors = new ISpyBotAccessors(conversationState)
-            //    {
-            //        CounterState = conversationState.CreateProperty<CounterState>(ISpyBotAccessors.CounterStateName),
-            //    };
-
-            //    return accessors;
-            //});
+                return accessors;
+            });
 
             services.AddMvc()
                  .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                  .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
         }
 
-        private static ConversationState GetBlobConversationState(BotConfiguration botConfig)
+        private static ConversationState GetBlobConversationState(IStorage dataStore)
         {
-            IStorage dataStore = GetBlobDataStore(botConfig);
             var conversationState = new ConversationState(dataStore);
             return conversationState;
+        }
+
+        private static UserState GetBlobUserState(IStorage dataStore)
+        {
+            var userState = new UserState(dataStore);
+            return userState;
         }
 
         private static IStorage GetBlobDataStore(BotConfiguration botConfig)

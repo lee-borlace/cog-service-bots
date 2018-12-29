@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
 
 namespace ISpyBot
 {
@@ -14,35 +15,25 @@ namespace ISpyBot
     /// </summary>
     public class ISpyBotAccessors
     {
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// Contains the <see cref="ConversationState"/> and associated <see cref="IStatePropertyAccessor{T}"/>.
-        /// </summary>
-        /// <param name="conversationState">The state object that stores the counter.</param>
-        public ISpyBotAccessors(ConversationState conversationState)
+        public ConversationState ConversationState { get; }
+
+        public UserState UserState { get; }
+
+        public ISpyBotAccessors(ConversationState conversationState, UserState userState)
         {
             ConversationState = conversationState ?? throw new ArgumentNullException(nameof(conversationState));
+            UserState = userState ?? throw new ArgumentNullException(nameof(userState));
         }
+      
+        public static string ConversationDataName { get; } = $"{nameof(ISpyBotAccessors)}.ConversationData";
+       
+        public IStatePropertyAccessor<ConversationData> ConversationData { get; set; }
 
-        /// <summary>
-        /// Gets the <see cref="IStatePropertyAccessor{T}"/> name used for the <see cref="CounterState"/> accessor.
-        /// </summary>
-        /// <remarks>Accessors require a unique name.</remarks>
-        /// <value>The accessor name for the counter accessor.</value>
-        public static string CounterStateName { get; } = $"{nameof(ISpyBotAccessors)}.CounterState";
+        public static string DialogStateName { get; } = $"{nameof(ISpyBotAccessors)}.DialogState";
 
-        /// <summary>
-        /// Gets or sets the <see cref="IStatePropertyAccessor{T}"/> for CounterState.
-        /// </summary>
-        /// <value>
-        /// The accessor stores the turn count for the conversation.
-        /// </value>
-        public IStatePropertyAccessor<CounterState> CounterState { get; set; }
+        public IStatePropertyAccessor<DialogState> DialogState { get; set; }
 
-        /// <summary>
-        /// Gets the <see cref="ConversationState"/> object for the conversation.
-        /// </summary>
-        /// <value>The <see cref="ConversationState"/> object.</value>
-        public ConversationState ConversationState { get; }
+
+
     }
 }

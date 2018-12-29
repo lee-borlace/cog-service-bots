@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 
@@ -24,18 +25,21 @@ namespace ISpyBot
     public class ISpyBotBot : IBot
     {
         private readonly ILogger _logger;
-        private readonly ConversationState _conversationState;
+        private readonly ISpyBotAccessors _accessors;
+        private DialogSet _dialogs;
 
-        public ISpyBotBot(ConversationState conversationState, ILoggerFactory loggerFactory)
+        public ISpyBotBot(ISpyBotAccessors accessors, ILoggerFactory loggerFactory)
         {
             if (loggerFactory == null)
             {
                 throw new System.ArgumentNullException(nameof(loggerFactory));
             }
 
-            _conversationState = conversationState ?? throw new ArgumentNullException(nameof(conversationState));
+            _accessors = accessors ?? throw new ArgumentNullException(nameof(_accessors));
             _logger = loggerFactory.CreateLogger<ISpyBotBot>();
             _logger.LogTrace("Turn start.");
+
+            _dialogs = new DialogSet(_accessors.DialogState);
         }
 
         /// <summary>
