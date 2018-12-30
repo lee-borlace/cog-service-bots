@@ -9,25 +9,28 @@ using System.Threading.Tasks;
 
 namespace ISpyBot.Dialogs
 {
-    public class ISpyBotDialog
+    public class ISpyBotDialogSet : DialogSet
     {
-        public class DialogNames
-        {
-            public const string WaterfallMain = "WaterfallMain";
-            public const string PromptConfirmPlayISpy = "PromptConfirmPlayISpy";
-            public const string ProcessConfirmPlay = "ProcessConfirmPlay";
-        }
+        private ISpyBotAccessors _accessors;
 
-
-        public static void InitialiseDialogSet(DialogSet dialogSet)
+        public ISpyBotDialogSet(ISpyBotAccessors accessors) : base(accessors.DialogState)
         {
-            dialogSet.Add(new WaterfallDialog(DialogNames.WaterfallMain, new WaterfallStep[]
+            _accessors = accessors;
+
+            Add(new WaterfallDialog(DialogNames.WaterfallMain, new WaterfallStep[]
             {
                 StepConfirmPlayISpyAsync,
                 StepProcessConfirmPlayAsync
             }));
 
-            dialogSet.Add(new ConfirmPrompt(DialogNames.PromptConfirmPlayISpy));
+            Add(new ConfirmPrompt(DialogNames.PromptConfirmPlayISpy));
+        }
+
+        public class DialogNames
+        {
+            public const string WaterfallMain = "WaterfallMain";
+            public const string PromptConfirmPlayISpy = "PromptConfirmPlayISpy";
+            public const string ProcessConfirmPlay = "ProcessConfirmPlay";
         }
         
 
@@ -50,15 +53,20 @@ namespace ISpyBot.Dialogs
         /// <returns></returns>
         private static async Task<DialogTurnResult> StepProcessConfirmPlayAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            // Yes, wants to play.
             if ((bool)stepContext.Result)
             {
+                // Send a message.
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text(Constants.Messages.StartingCamera), cancellationToken);
 
+                // Send an event so the page fires up the camera.
                 var eventAction = stepContext.Context.Activity.CreateReply();
                 eventAction.Type = ActivityTypes.Event;
                 eventAction.Name = Constants.BotEvents.ReadyForCamera;
-
                 await stepContext.Context.SendActivityAsync(eventAction);
+
+                // Set bot state to indicate we're waiting for tags.
+                
             }
             else
             {

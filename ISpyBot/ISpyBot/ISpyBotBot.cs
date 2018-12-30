@@ -45,8 +45,7 @@ namespace ISpyBot
             _accessors = accessors ?? throw new ArgumentNullException(nameof(_accessors));
             _logger = loggerFactory.CreateLogger<ISpyBotBot>();
 
-            _dialogs = new DialogSet(_accessors.DialogState);
-            ISpyBotDialog.InitialiseDialogSet(_dialogs);
+            _dialogs = new ISpyBotDialogSet(_accessors);
         }
 
         public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
@@ -61,7 +60,7 @@ namespace ISpyBot
                 {
                     if (turnContext.Activity.MembersAdded.First().Id.Contains("bot", StringComparison.OrdinalIgnoreCase))
                     {
-                        await dialogContext.BeginDialogAsync(ISpyBotDialog.DialogNames.WaterfallMain, null, cancellationToken);
+                        await dialogContext.BeginDialogAsync(ISpyBotDialogSet.DialogNames.WaterfallMain, null, cancellationToken);
                     }
                 }
             }
@@ -71,7 +70,7 @@ namespace ISpyBot
                 // If the DialogTurnStatus is Empty we should start a new dialog.
                 if (results.Status == DialogTurnStatus.Empty)
                 {
-                    await dialogContext.BeginDialogAsync(ISpyBotDialog.DialogNames.WaterfallMain, null, cancellationToken);
+                    await dialogContext.BeginDialogAsync(ISpyBotDialogSet.DialogNames.WaterfallMain, null, cancellationToken);
                 }
             }
             // Event

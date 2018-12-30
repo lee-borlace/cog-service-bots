@@ -10,5 +10,7 @@ namespace ISpyBot
         public string ObjectChosenByBot { get; set; }
 
         public int NumberOfGuesses { get; set; }
+
+        public bool WaitingForTagsFromVision { get; set; }
     }
 }
