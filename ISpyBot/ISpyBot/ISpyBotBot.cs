@@ -2,15 +2,19 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ISpyBot.Dialogs;
+using ISpyBot.Model;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace ISpyBot
 {
@@ -73,7 +77,7 @@ namespace ISpyBot
             // Event
             else if (turnContext.Activity.Type == ActivityTypes.Event)
             {
-                Trace.TraceInformation("!!!");
+                var tags = (turnContext.Activity.Value as JArray)?.ToObject<List<Tag>>();
             }
         }
     }

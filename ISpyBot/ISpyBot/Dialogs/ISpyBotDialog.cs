@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,8 +55,8 @@ namespace ISpyBot.Dialogs
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text(Constants.Messages.StartingCamera), cancellationToken);
 
                 var eventAction = stepContext.Context.Activity.CreateReply();
-                eventAction.Type = "event";
-                eventAction.Name = "readyForCamera";
+                eventAction.Type = ActivityTypes.Event;
+                eventAction.Name = Constants.BotEvents.ReadyForCamera;
 
                 await stepContext.Context.SendActivityAsync(eventAction);
             }

@@ -23,5 +23,11 @@ namespace ISpyBot
             public const string ExpectingInput = "expectingInput";
             public const string IgnoringInput = "ignoringInput";
         }
+
+        public class BotEvents
+        {
+            public const string ReadyForCamera = "readyForCamera";
+            public const string ImageAnalysed = "imageAnalysed";
+        }
     }
 }

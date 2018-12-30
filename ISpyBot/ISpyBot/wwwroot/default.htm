@@ -101,11 +101,19 @@
 
                         console.log("Vision API analysis finished.");
 
+                        console.log(data);
+
+                        var tags = [];
+
+                        if (data.tags) {
+                            tags = data.tags.map(tag => tag);
+                        }
+
                         directLine.postActivity({
                             type: 'event',
-                            name: 'imageanalysed',
+                            name: 'imageAnalysed',
                             from: { id: userId },
-                            value: data
+                            value: tags
                         }).subscribe(function () { });
 
                     })
