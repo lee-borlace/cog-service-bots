@@ -49,6 +49,7 @@
 
                 function handleError(error) {
                     console.error('navigator.getUserMedia error: ', error);
+                    sendImageErrorToBot(error);
                 };
 
                 // Fired when camera has been mapped to the video.
@@ -130,6 +131,8 @@
 
                         console.log(errorString);
 
+                        sendImageErrorToBot(errorString);
+
                     });
             };
 
@@ -156,6 +159,16 @@
 
                 return new Blob([uInt8Array], { type: contentType });
             };
+
+            sendImageErrorToBot = function (error) {
+
+                directLine.postActivity({
+                    type: 'event',
+                    name: 'imageError',
+                    from: { id: userId },
+                    value: error
+                }).subscribe(function () { });
+            }
 
             var res = await fetch('/api/directlinetoken', { method: 'POST' });
             var resultObject = await res.json();
