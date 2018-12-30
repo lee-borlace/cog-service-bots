@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>I Spy Bot</title>
-    <script src="webchat.js"></script>
+    <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <style>
         html, body {
@@ -25,7 +25,7 @@
 <body>
 
     <video class="videostream" autoplay style="height:50%"></video>
-    
+
     <img id="sourceImage" style="display:none" />
     <div id="webchat" role="main" style="height:50%"></div>
 
@@ -40,32 +40,6 @@
                 }
             };
 
-            var res = await fetch('/api/directlinetoken', { method: 'POST' });
-            var resultObject = await res.json();
-            var directLineToken = resultObject.Token;
-            res = await fetch('/api/speechtoken', { method: 'POST' });
-            resultObject = await res.json();
-            region = resultObject.Region;
-            var speechToken = resultObject.Token;
-            var webSpeechPonyfillFactory = await window.WebChat.createCognitiveServicesSpeechServicesPonyfillFactory({ authorizationToken: speechToken, region: region });
-
-            // For handling back-channel events from the bot.
-            const store = window.WebChat.createStore(
-                {},
-                ({ dispatch }) => next => action => {
-
-                    if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
-
-                        const { activity } = action.payload;
-
-                        if (activity.type === 'event' && activity.name === 'readyForCamera') {
-                            processCameraStart();
-                        }
-                    }
-
-                    return next(action);
-                }
-            );
 
 
             // User has selected to play I Spy. Start to access the camera.
@@ -92,7 +66,7 @@
                     .then(handleSuccess)
                     .catch(handleError);
             };
-           
+
 
             // Take a snapshot from the camera and pass it to vision API to extract tags.
             processImage = function () {
@@ -122,8 +96,64 @@
                     data: makeblob(dataUrl)
                 })
 
+                    // Called vision API OK. Post an event to the bot.
                     .done(function (data) {
-                        console.log(JSON.stringify(data, null, 2));
+
+                        console.log("Analysis finished.");
+
+                        // console.log(JSON.stringify(data, null, 2));
+
+                        //store.dispatch({
+                        //    type: 'DIRECT_LINE/POST_ACTIVITY',
+                        //    payload: {
+                        //        type: 'event',
+                        //        name: 'imageanalysed',
+                        //        from: userId,
+                        //        value: data,
+                        //    }
+                        //});
+
+                        //store.dispatch({
+                        //    type: 'DIRECT_LINE/POST_ACTIVITY',
+                        //    payload: {
+                        //        type: 'message',
+                        //        text: 'hi',
+                        //        textFormat: 'plain'
+                        //    }
+                        //});
+
+                        //store.dispatch({
+                        //    type: 'WEB_CHAT/SET_SEND_BOX',
+                        //    payload: {
+                        //        type: 'event',
+                        //        name: 'imageanalysed',
+                        //        from: userId,
+                        //        value: data,
+                        //        text: ''
+                        //    }
+                        //});
+
+                        directLine.postActivity(
+                        {
+                            type: 'event',
+                            name: 'imageanalysed',
+                            from: userId,
+                            value: data,
+                        });
+
+
+                        //fetchAsObservable({
+                        //    method: "POST",
+                        //    url: `${this.domain}/conversations/${this.conversationId}/activities`,
+                        //    body: JSON.stringify(activity),
+                        //    timeout,
+                        //    headers: {
+                        //        "Content-Type": "application/json",
+                        //        "Authorization": `Bearer ${this.token}`
+                        //    }
+                        //})
+
+
                     })
 
                     .fail(function (jqXHR, textStatus, errorThrown) {
@@ -165,9 +195,44 @@
                 return new Blob([uInt8Array], { type: contentType });
             };
 
+            var res = await fetch('/api/directlinetoken', { method: 'POST' });
+            var resultObject = await res.json();
+            var directLineToken = resultObject.Token;
+
+            var userId = resultObject.UserId;
+
+            res = await fetch('/api/speechtoken', { method: 'POST' });
+            resultObject = await res.json();
+            region = resultObject.Region;
+            var speechToken = resultObject.Token;
+            var webSpeechPonyfillFactory = await window.WebChat.createCognitiveServicesSpeechServicesPonyfillFactory({ authorizationToken: speechToken, region: region });
+
+
+            var directLine = window.WebChat.createDirectLine({ token: directLineToken });
+
+            // For handling back-channel events from the bot.
+            const store = window.WebChat.createStore(
+                {},
+                ({ dispatch }) => next => action => {
+
+                    console.log(action);
+
+                    if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
+
+                        const { activity } = action.payload;
+
+                        if (activity.type === 'event' && activity.name === 'readyForCamera') {
+                            processCameraStart();
+                        }
+                    }
+
+                    return next(action);
+                }
+            );
+
             // Set up bot.
             window.WebChat.renderWebChat({
-                directLine: window.WebChat.createDirectLine({ token: directLineToken }),
+                directLine: directLine,
                 webSpeechPonyfillFactory,
                 store
             }, document.getElementById('webchat'));

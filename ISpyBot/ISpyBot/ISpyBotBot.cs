@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,6 +69,11 @@ namespace ISpyBot
                 {
                     await dialogContext.BeginDialogAsync(ISpyBotDialog.DialogNames.WaterfallMain, null, cancellationToken);
                 }
+            }
+            // Event
+            else if (turnContext.Activity.Type == ActivityTypes.Event)
+            {
+                Trace.TraceInformation("!!!");
             }
         }
     }
