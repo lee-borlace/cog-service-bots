@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>I Spy Bot</title>
     <script src="webchat.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <style>
         html, body {
             height: 100%
@@ -22,10 +23,22 @@
     </style>
 </head>
 <body>
-    <div id="webchat" role="main"></div>
+
+    <video class="videostream" autoplay style="height:50%"></video>
+    
+    <img id="sourceImage" style="display:none" />
+    <div id="webchat" role="main" style="height:50%"></div>
+
     <script>
 
         (async function () {
+
+            const constraints = {
+                video: {
+                    width: { exact: 640 },
+                    height: { exact: 480 }
+                }
+            };
 
             var res = await fetch('/api/directlinetoken', { method: 'POST' });
             var resultObject = await res.json();
@@ -36,9 +49,127 @@
             var speechToken = resultObject.Token;
             var webSpeechPonyfillFactory = await window.WebChat.createCognitiveServicesSpeechServicesPonyfillFactory({ authorizationToken: speechToken, region: region });
 
+            // For handling back-channel events from the bot.
+            const store = window.WebChat.createStore(
+                {},
+                ({ dispatch }) => next => action => {
+
+                    if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
+
+                        const { activity } = action.payload;
+
+                        if (activity.type === 'event' && activity.name === 'readyForCamera') {
+                            processCameraStart();
+                        }
+                    }
+
+                    return next(action);
+                }
+            );
+
+
+            // User has selected to play I Spy. Start to access the camera.
+            processCameraStart = function () {
+
+                var video = document.querySelector('video');
+
+                function handleError(error) {
+                    console.error('navigator.getUserMedia error: ', error);
+                };
+
+                // Fired when camera has been mapped to the video.
+                function handleSuccess(stream) {
+                    localMediaStream = stream;
+                    video.srcObject = stream;
+
+                    // When finished loading, process an image.
+                    video.onloadeddata = function () {
+                        processImage();
+                    }
+                }
+
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(handleSuccess)
+                    .catch(handleError);
+            };
+           
+
+            // Take a snapshot from the camera and pass it to vision API to extract tags.
+            processImage = function () {
+
+                var canvas = document.createElement('canvas');
+                var video = document.querySelector('video');
+
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+
+                var dataUrl = canvas.toDataURL('image/jpeg');
+
+                // Perform the REST API call.
+                $.ajax({
+                    url: '/api/vision/analyse',
+                    processData: false,
+
+                    // Request headers.
+                    beforeSend: function (xhrObj) {
+                        xhrObj.setRequestHeader("Content-Type", "application/octet-stream");
+                    },
+
+                    type: "POST",
+
+                    // Request body.
+                    data: makeblob(dataUrl)
+                })
+
+                    .done(function (data) {
+                        console.log(JSON.stringify(data, null, 2));
+                    })
+
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        // Display error message.
+                        var errorString = (errorThrown === "") ?
+                            "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+
+                        errorString += (jqXHR.responseText === "") ?
+                            "" : (jQuery.parseJSON(jqXHR.responseText).message) ?
+                                jQuery.parseJSON(jqXHR.responseText).message :
+                                jQuery.parseJSON(jqXHR.responseText).error.message;
+
+                        console.log(errorString);
+
+                    });
+            };
+
+            // Utility function for turning data URL into blob.
+            makeblob = function (dataURL) {
+                var BASE64_MARKER = ';base64,';
+                if (dataURL.indexOf(BASE64_MARKER) == -1) {
+                    var parts = dataURL.split(',');
+                    var contentType = parts[0].split(':')[1];
+                    var raw = decodeURIComponent(parts[1]);
+                    return new Blob([raw], { type: contentType });
+                }
+
+                var parts = dataURL.split(BASE64_MARKER);
+                var contentType = parts[0].split(':')[1];
+                var raw = window.atob(parts[1]);
+                var rawLength = raw.length;
+
+                var uInt8Array = new Uint8Array(rawLength);
+
+                for (var i = 0; i < rawLength; ++i) {
+                    uInt8Array[i] = raw.charCodeAt(i);
+                }
+
+                return new Blob([uInt8Array], { type: contentType });
+            };
+
+            // Set up bot.
             window.WebChat.renderWebChat({
                 directLine: window.WebChat.createDirectLine({ token: directLineToken }),
-                webSpeechPonyfillFactory
+                webSpeechPonyfillFactory,
+                store
             }, document.getElementById('webchat'));
 
             document.querySelector('#webchat > *').focus();

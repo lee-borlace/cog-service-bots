@@ -52,6 +52,12 @@ namespace ISpyBot.Dialogs
             if ((bool)stepContext.Result)
             {
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text(Constants.Messages.StartingCamera), cancellationToken);
+
+                var eventAction = stepContext.Context.Activity.CreateReply();
+                eventAction.Type = "event";
+                eventAction.Name = "readyForCamera";
+
+                await stepContext.Context.SendActivityAsync(eventAction);
             }
             else
             {
