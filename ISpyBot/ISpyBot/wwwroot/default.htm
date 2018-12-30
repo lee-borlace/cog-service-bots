@@ -99,60 +99,14 @@
                     // Called vision API OK. Post an event to the bot.
                     .done(function (data) {
 
-                        console.log("Analysis finished.");
+                        console.log("Vision API analysis finished.");
 
-                        // console.log(JSON.stringify(data, null, 2));
-
-                        //store.dispatch({
-                        //    type: 'DIRECT_LINE/POST_ACTIVITY',
-                        //    payload: {
-                        //        type: 'event',
-                        //        name: 'imageanalysed',
-                        //        from: userId,
-                        //        value: data,
-                        //    }
-                        //});
-
-                        //store.dispatch({
-                        //    type: 'DIRECT_LINE/POST_ACTIVITY',
-                        //    payload: {
-                        //        type: 'message',
-                        //        text: 'hi',
-                        //        textFormat: 'plain'
-                        //    }
-                        //});
-
-                        //store.dispatch({
-                        //    type: 'WEB_CHAT/SET_SEND_BOX',
-                        //    payload: {
-                        //        type: 'event',
-                        //        name: 'imageanalysed',
-                        //        from: userId,
-                        //        value: data,
-                        //        text: ''
-                        //    }
-                        //});
-
-                        directLine.postActivity(
-                        {
+                        directLine.postActivity({
                             type: 'event',
                             name: 'imageanalysed',
-                            from: userId,
-                            value: data,
-                        });
-
-
-                        //fetchAsObservable({
-                        //    method: "POST",
-                        //    url: `${this.domain}/conversations/${this.conversationId}/activities`,
-                        //    body: JSON.stringify(activity),
-                        //    timeout,
-                        //    headers: {
-                        //        "Content-Type": "application/json",
-                        //        "Authorization": `Bearer ${this.token}`
-                        //    }
-                        //})
-
+                            from: { id: userId },
+                            value: data
+                        }).subscribe(function () { });
 
                     })
 
@@ -214,8 +168,6 @@
             const store = window.WebChat.createStore(
                 {},
                 ({ dispatch }) => next => action => {
-
-                    console.log(action);
 
                     if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
 
