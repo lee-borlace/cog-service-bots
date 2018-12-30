@@ -60,7 +60,7 @@ namespace ISpyBot
                 {
                     if (turnContext.Activity.MembersAdded.First().Id.Contains("bot", StringComparison.OrdinalIgnoreCase))
                     {
-                        await dialogContext.BeginDialogAsync(ISpyBotDialogSet.DialogNames.WaterfallMain, null, cancellationToken);
+                        await dialogContext.BeginDialogAsync(ISpyBotDialogSet.DialogNames.WaterfallWantToPlay, null, cancellationToken);
                     }
                 }
             }
@@ -70,19 +70,54 @@ namespace ISpyBot
                 // If the DialogTurnStatus is Empty we should start a new dialog.
                 if (results.Status == DialogTurnStatus.Empty)
                 {
-                    await dialogContext.BeginDialogAsync(ISpyBotDialogSet.DialogNames.WaterfallMain, null, cancellationToken);
+                    await dialogContext.BeginDialogAsync(ISpyBotDialogSet.DialogNames.WaterfallWantToPlay, null, cancellationToken);
                 }
             }
             // Event
             else if (turnContext.Activity.Type == ActivityTypes.Event)
             {
-                // Clear out some not very useful tags for this game.
-                var tagsToIgnore = new List<string>() { "indoor", "outdoor" };
+                if(turnContext.Activity.Name == Constants.BotEvents.ImageAnalysed)
+                {
+                    // Clear out some not very useful tags for this game.
+                    var tagsToIgnore = new List<string>() { "indoor", "outdoor" };
+                    var tags = (turnContext.Activity.Value as JArray)?.ToObject<List<Tag>>();
+                    tags = tags.Where(t => !tagsToIgnore.Contains(t.Name)).ToList();
 
-                var tags = (turnContext.Activity.Value as JArray)?.ToObject<List<Tag>>();
+                    // If we're waiting for tags, then kick off the next dialog.
+                    var botState = await _accessors.ISpyBotState.GetAsync(turnContext, () => new ISpyBotState());
+                    if(botState.WaitingForTagsFromVision)
+                    {
+                        // Found at least one tag.
+                        if (tags.Count > 0)
+                        {
+                            var randomTagIndex = new Random(Guid.NewGuid().GetHashCode()).Next(0, tags.Count - 1);
 
-                tags = tags.Where(t => !tagsToIgnore.Contains(t.Name)).ToList();
+                            botState.WaitingForTagsFromVision = false;
+                            botState.NumberOfGuesses = 0;
+                            botState.ObjectChosenByBot = tags[randomTagIndex].Name;
+
+                            await _accessors.ISpyBotState.SetAsync(turnContext, botState);
+                            await _accessors.ConversationState.SaveChangesAsync(turnContext);
+
+                            await dialogContext.BeginDialogAsync(ISpyBotDialogSet.DialogNames.WaterfallPlayGame, null, cancellationToken);
+                        }
+                        // Didn't find a tag - something's gone wrong.
+                        else
+                        {
+                            await DoImageErrorMessage(turnContext);
+                        }
+                    }
+                }
+                else if (turnContext.Activity.Name == Constants.BotEvents.ImageError)
+                {
+                    await DoImageErrorMessage(turnContext);
+                }
             }
+        }
+
+        private async Task DoImageErrorMessage(ITurnContext turnContext)
+        {
+
         }
     }
 }

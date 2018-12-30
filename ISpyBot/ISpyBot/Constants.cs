@@ -15,6 +15,8 @@ namespace ISpyBot
             public const string GotOne = "OK, got one!";
             public const string ISpy = "I spy, with my little eye, something beginning with {0}.";
             public const string CouldntFindAnything = "Hmm, I'm having trouble seeing anything.";
+            public const string Correct = "That's right, it was {0}!";
+            public const string Incorrect = "Nope, it was {0}!";
         }
 
         public class InputHint
@@ -28,6 +30,7 @@ namespace ISpyBot
         {
             public const string ReadyForCamera = "readyForCamera";
             public const string ImageAnalysed = "imageAnalysed";
+            public const string ImageError = "imageError";
         }
     }
 }

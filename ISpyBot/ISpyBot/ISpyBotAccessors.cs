@@ -27,7 +27,7 @@ namespace ISpyBot
       
         public static string ConversationDataName { get; } = $"{nameof(ISpyBotAccessors)}.ConversationData";
        
-        public IStatePropertyAccessor<ConversationData> ConversationData { get; set; }
+        public IStatePropertyAccessor<ISpyBotState> ISpyBotState { get; set; }
 
         public static string DialogStateName { get; } = $"{nameof(ISpyBotAccessors)}.DialogState";
 

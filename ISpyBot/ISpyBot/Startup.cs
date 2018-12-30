@@ -112,7 +112,7 @@ namespace ISpyBot
             {
                 var accessors = new ISpyBotAccessors(conversationState, userState)
                 {
-                    ConversationData = conversationState.CreateProperty<ConversationData>(ISpyBotAccessors.ConversationDataName),
+                    ISpyBotState = conversationState.CreateProperty<ISpyBotState>(ISpyBotAccessors.ConversationDataName),
                     DialogState = conversationState.CreateProperty<DialogState>(ISpyBotAccessors.DialogStateName),
                 };
 
