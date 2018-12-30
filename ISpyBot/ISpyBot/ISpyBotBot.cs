@@ -66,7 +66,7 @@ namespace ISpyBot
                 }
             }
             // Message.
-            else if (turnContext.Activity.Type == ActivityTypes.Message)
+            else if (turnContext.Activity.Type == ActivityTypes.Message )
             {
                 // If the DialogTurnStatus is Empty we should start a new dialog.
                 if (results.Status == DialogTurnStatus.Empty)
@@ -77,7 +77,12 @@ namespace ISpyBot
             // Event
             else if (turnContext.Activity.Type == ActivityTypes.Event)
             {
+                // Clear out some not very useful tags for this game.
+                var tagsToIgnore = new List<string>() { "indoor", "outdoor" };
+
                 var tags = (turnContext.Activity.Value as JArray)?.ToObject<List<Tag>>();
+
+                tags = tags.Where(t => !tagsToIgnore.Contains(t.Name)).ToList();
             }
         }
     }
