@@ -63,7 +63,7 @@ namespace FaceRecogniseBot
             // Echo back to the user whatever they typed.
             if (turnContext.Activity.Type == ActivityTypes.Message)
             {
-                var responseMessage = $"{turnContext.Activity.From.Name} said '{turnContext.Activity.Text}'\n";
+                var responseMessage = $"You said '{turnContext.Activity.Text}'\n";
                 await turnContext.SendActivityAsync(responseMessage);
             }
             // Received event to start conversation.

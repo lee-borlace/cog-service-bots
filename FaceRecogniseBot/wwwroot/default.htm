@@ -207,8 +207,8 @@
                 // Set up bot.
                 window.WebChat.renderWebChat({
                     directLine: _directLine,
-                    user: { id: userId, name: userName },
-                    store
+                    userID: userId,
+                    store,
                 }, document.getElementById('webchat'));
 
                 // Send event so bot greets user.
