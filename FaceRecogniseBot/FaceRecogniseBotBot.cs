@@ -92,7 +92,7 @@ namespace FaceRecogniseBot
                     }
                     else
                     {
-                        await turnContext.SendActivityAsync($"I can't see anyone!");
+                        await turnContext.SendActivityAsync($"Is anyone there?");
                     }
                 }
             }
