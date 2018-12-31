@@ -22,5 +22,7 @@
     <PackageReference Include="Microsoft.Bot.Connector" Version="4.2.0" />
     <PackageReference Include="Microsoft.Bot.Schema" Version="4.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.2.0" />
+    <PackageReference Include="Microsoft.ProjectOxford.Face.DotNetCore" Version="1.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
   </ItemGroup>
 </Project>

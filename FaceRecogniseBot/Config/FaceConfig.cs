@@ -8,5 +8,7 @@ namespace FaceRecogniseBot.Config
     public class FaceConfig
     {
         public string ApiKey { get; set; }
+
+        public string Region { get; set; }
     }
 }
