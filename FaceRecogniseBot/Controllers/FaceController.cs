@@ -62,7 +62,7 @@ namespace FaceRecogniseBot.Controllers
                         }
 
                         // At this point we've found a face but we don't know who it is.
-                        retVal = "unknown";
+                        retVal = "unknown person";
                     }
 
                     // Found a main face. Try to identify it.
@@ -74,7 +74,12 @@ namespace FaceRecogniseBot.Controllers
                         {
                             if(identifyResult[0].Candidates != null && identifyResult[0].Candidates.Any())
                             {
-                                retVal = identifyResult[0].Candidates.First().PersonId.ToString();
+                                var personId = identifyResult[0].Candidates.First().PersonId.ToString();
+
+                                if (_faceConfig.UserIdToNameMappings != null && _faceConfig.UserIdToNameMappings.ContainsKey(personId))
+                                {
+                                    retVal = _faceConfig.UserIdToNameMappings[personId];
+                                }
                             }
                         }
                     }

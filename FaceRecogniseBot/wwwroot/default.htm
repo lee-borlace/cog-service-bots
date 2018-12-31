@@ -66,7 +66,6 @@
             };
 
 
-            // Take a snapshot from the camera and pass it to vision API to extract tags.
             processImage = function () {
 
                 var canvas = document.createElement('canvas');
@@ -97,11 +96,13 @@
                     // Called vision API OK. Post an event to the bot.
                     .done(function (data) {
 
+                        console.log("Identified person : " + data);
+
                         directLine.postActivity({
                             type: 'event',
                             name: 'facesAnalysed',
                             from: { id: userId },
-                            value: tags
+                            value: data
                         }).subscribe(function () { });
 
                     })

@@ -80,6 +80,22 @@ namespace FaceRecogniseBot
                 var responseMessage = $"You sent '{turnContext.Activity.Text}'\n";
                 await turnContext.SendActivityAsync(responseMessage);
             }
+            else if (turnContext.Activity.Type == ActivityTypes.Event)
+            {
+                if (turnContext.Activity.Name == Constants.BotEvents.FacesAnalysed)
+                {
+                    var name = turnContext.Activity.Value.ToString();
+
+                    if(!string.IsNullOrWhiteSpace(name))
+                    {
+                        await turnContext.SendActivityAsync($"Welcome {name}!");
+                    }
+                    else
+                    {
+                        await turnContext.SendActivityAsync($"I can't see anyone!");
+                    }
+                }
+            }
         }
     }
 }
