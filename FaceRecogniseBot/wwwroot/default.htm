@@ -26,12 +26,8 @@
 <body>
 
     <video class="videostream" autoplay style="height:50%"></video>
-
     <img id="sourceImage" style="display:none" />
-
     <div style="height:50%" id="msgInstruction"><h2>Please step in front of the camera so I can see you!</h2></div>
-    <div style="height:50%;display:none;" id="msgNoOneThere"><h2>Is anyone there?</h2></div>
-
     <div id="webchat" role="main" style="height:50%"></div>
 
     <script>
@@ -64,13 +60,16 @@
 
                     // User ID has changed - re-initialise bot.
                     if (newUserId != _userId) {
+
+                        _directLine = null;
+                        $("#webchat").empty();
+
                         initialiseBot(newUserId, split[1]);
                     }
                 }
                 // Couldn't see anyone.
                 else {
-                    $("#msgInstruction").hide();
-                    $("#msgNoOneThere").show();
+                    $("#msgInstruction").show();
                     $("#webchat").hide();
                 }
 
@@ -172,31 +171,10 @@
 
                 _directLine = window.WebChat.createDirectLine({ token: directLineToken });
 
-                // For handling back-channel events from the bot.
-                store = window.WebChat.createStore(
-                    {},
-                    ({ dispatch }) => next => action => {
-
-                        // Handle events from bot.
-                        if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
-
-                            const { activity } = action.payload;
-
-                            // When we get event for starting camera, start processing camera.
-                            if (activity.type === 'event' && activity.name === 'readyForCamera') {
-                                processCameraStart();
-                            }
-                        }
-
-                        return next(action);
-                    }
-                );
-
                 // Set up bot.
                 window.WebChat.renderWebChat({
                     directLine: _directLine,
                     userID: userId,
-                    store,
                 }, document.getElementById('webchat'));
 
                 // Send event so bot greets user.
