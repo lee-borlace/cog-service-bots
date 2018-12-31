@@ -45,7 +45,19 @@
                 }
             };
 
+            let webWorker;
+
+            handleWebWorkerMessage = function (event) {
+                webWorker.terminate();
+                console.log("Got message from worker.");
+                webWorker = new Worker("webWorker.js");
+                webWorker.onmessage = handleWebWorkerMessage;
+            }
+
             processCameraStart = async function () {
+
+                webWorker = new Worker("webWorker.js");
+                webWorker.onmessage = handleWebWorkerMessage;
 
                 var video = document.querySelector('video');
 
@@ -107,7 +119,13 @@
                         if (data && data!= '') {
                             $("#msgInstruction").hide();
                             var split = data.split(';');
-                            initialiseBot(split[0], split[1]);
+
+                            var newUserId = split[0];
+
+                            // User ID has changed.
+                            if (newUserId != _userId) {
+                                initialiseBot(newUserId, split[1]);
+                            }
                         }
                         // Couldn't see anyone.
                         else {
@@ -170,7 +188,7 @@
 
             let _directLine;
             let store;
-            let _userId;
+            let _userId = '';
             let _userName;
 
             initialiseBot = async function (userId, userName) {
