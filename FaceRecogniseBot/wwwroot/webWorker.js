@@ -1,7 +1,27 @@
-﻿var timeBetweenCalls = 3000;
+﻿var delay = 5000;
+let _dataBlob;
 
-function callFaceApi() {
-    postMessage("event!");
+async function callFaceApi() {
+
+    var apiResult = await fetch(
+        '/api/face/identifyMainFace',
+        {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/octet-stream",
+            },
+            body: _dataBlob
+        });
+
+    var faceAnalysisResult = await apiResult.text();
+
+    postMessage(faceAnalysisResult);
 }
 
-setTimeout("callFaceApi()", timeBetweenCalls);
+
+
+self.onmessage = function (msg) {
+    _dataBlob = msg.data.dataBlob;
+    setTimeout("callFaceApi()", delay);
+}
+

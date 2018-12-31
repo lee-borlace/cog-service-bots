@@ -71,7 +71,7 @@ namespace FaceRecogniseBot
             {
                 if (turnContext.Activity.Name == Constants.BotEvents.FacesAnalysed)
                 {
-                    await turnContext.SendActivityAsync($"Welcome {turnContext.Activity.From.Name}!");
+                    await turnContext.SendActivityAsync($"Hi {turnContext.Activity.From.Name}!");
                 }
             }
         }

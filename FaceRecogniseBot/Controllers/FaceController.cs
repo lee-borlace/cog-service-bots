@@ -94,9 +94,8 @@ namespace FaceRecogniseBot.Controllers
             catch(Exception ex)
             {
                 Trace.TraceError(ex.ToString());
+                return string.Empty;
             }
-
-            return "test";
         }
     }
 }

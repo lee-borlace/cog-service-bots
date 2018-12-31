@@ -47,17 +47,38 @@
 
             let webWorker;
 
-            handleWebWorkerMessage = function (event) {
+            handleWebWorkerMessage = async function (event) {
                 webWorker.terminate();
-                console.log("Got message from worker.");
-                webWorker = new Worker("webWorker.js");
-                webWorker.onmessage = handleWebWorkerMessage;
+
+                console.log("Identified person : " + event.data);
+
+                // Could see someone. Extract ID and name.
+                if (event.data && event.data!= '') {
+
+                    $("#msgInstruction").hide();
+                    $("#webchat").show();
+
+                    var split = event.data.split(';');
+
+                    var newUserId = split[0];
+
+                    // User ID has changed - re-initialise bot.
+                    if (newUserId != _userId) {
+                        initialiseBot(newUserId, split[1]);
+                    }
+                }
+                // Couldn't see anyone.
+                else {
+                    $("#msgInstruction").hide();
+                    $("#msgNoOneThere").show();
+                    $("#webchat").hide();
+                }
+
+
+                await processImage();
             }
 
             processCameraStart = async function () {
-
-                webWorker = new Worker("webWorker.js");
-                webWorker.onmessage = handleWebWorkerMessage;
 
                 var video = document.querySelector('video');
 
@@ -73,6 +94,7 @@
 
                     // When finished loading, start processing.
                     video.onloadeddata = async function () {
+
                         await processImage();
                     }
                 }
@@ -82,75 +104,6 @@
                     .catch(handleError);
             };
 
-
-            processImage = async function () {
-
-                var canvas = document.createElement('canvas');
-                var video = document.querySelector('video');
-
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-
-                var dataUrl = canvas.toDataURL('image/jpeg');
-
-                // Perform the REST API call.
-                $.ajax({
-                    url: '/api/face/identifyMainFace',
-                    processData: false,
-
-                    // Request headers.
-                    beforeSend: function (xhrObj) {
-                        xhrObj.setRequestHeader("Content-Type", "application/octet-stream");
-                    },
-
-                    type: "POST",
-
-                    // Request body.
-                    data: makeblob(dataUrl)
-                })
-
-                    // Called vision API OK. Post an event to the bot.
-                    .done(function (data) {
-
-                        console.log("Identified person : " + data);
-
-                        // Could see someone. Extract ID and name.
-                        if (data && data!= '') {
-                            $("#msgInstruction").hide();
-                            var split = data.split(';');
-
-                            var newUserId = split[0];
-
-                            // User ID has changed.
-                            if (newUserId != _userId) {
-                                initialiseBot(newUserId, split[1]);
-                            }
-                        }
-                        // Couldn't see anyone.
-                        else {
-                            $("#msgInstruction").hide();
-                            $("#msgNoOneThere").show();
-                        }
-
-                    })
-
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        // Display error message.
-                        var errorString = (errorThrown === "") ?
-                            "Error. " : errorThrown + " (" + jqXHR.status + "): ";
-
-                        errorString += (jqXHR.responseText === "") ?
-                            "" : (jQuery.parseJSON(jqXHR.responseText).message) ?
-                                jQuery.parseJSON(jqXHR.responseText).message :
-                                jQuery.parseJSON(jqXHR.responseText).error.message;
-
-                        console.log(errorString);
-
-                        sendImageErrorToBot(errorString);
-
-                    });
-            };
 
             // Utility function for turning data URL into blob.
             makeblob = function (dataURL) {
@@ -174,6 +127,23 @@
                 }
 
                 return new Blob([uInt8Array], { type: contentType });
+            };
+
+            processImage = async function () {
+
+                var canvas = document.createElement('canvas');
+                var video = document.querySelector('video');
+
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+
+                var dataUrl = canvas.toDataURL('image/jpeg');
+
+                // Reset web worker to deal with API.
+                webWorker = new Worker("webWorker.js");
+                webWorker.onmessage = handleWebWorkerMessage;
+                webWorker.postMessage({ dataBlob: makeblob(dataUrl) });
             };
 
             sendImageErrorToBot = function (error) {
