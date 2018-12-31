@@ -30,10 +30,14 @@ namespace FaceRecogniseBot.Controllers
                 $"https://{_faceConfig.Region}.api.cognitive.microsoft.com/face/v1.0/");
         }
 
-        // Returns
-        // Name of person if was able to identify someone
-        // "unknown" if saw a face but couldn't identify it
-        // empty string if didn't see a face
+
+        /// <summary>
+        /// Returns {personId};{personName}
+        /// 
+        /// If can't see anyone, returns blank.
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("identifyMainFace")]
         public async Task<string> IdentifyMainFace()
         {
@@ -62,7 +66,7 @@ namespace FaceRecogniseBot.Controllers
                         }
 
                         // At this point we've found a face but we don't know who it is.
-                        retVal = "unknown person";
+                        retVal = $"{Guid.NewGuid()};unknown person";
                     }
 
                     // Found a main face. Try to identify it.
@@ -78,7 +82,7 @@ namespace FaceRecogniseBot.Controllers
 
                                 if (_faceConfig.UserIdToNameMappings != null && _faceConfig.UserIdToNameMappings.ContainsKey(personId))
                                 {
-                                    retVal = _faceConfig.UserIdToNameMappings[personId];
+                                    retVal = $"{personId};{_faceConfig.UserIdToNameMappings[personId]}";
                                 }
                             }
                         }

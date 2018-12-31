@@ -6,6 +6,7 @@
     <title>I Spy Bot</title>
     <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/simple-update-in/dist/simple-update-in.production.min.js"></script>
     <style>
         html, body {
             height: 100%
@@ -27,6 +28,10 @@
     <video class="videostream" autoplay style="height:50%"></video>
 
     <img id="sourceImage" style="display:none" />
+
+    <div style="height:50%" id="msgInstruction"><h2>Please step in front of the camera so I can see you!</h2></div>
+    <div style="height:50%;display:none;" id="msgNoOneThere"><h2>Is anyone there?</h2></div>
+
     <div id="webchat" role="main" style="height:50%"></div>
 
     <script>
@@ -40,7 +45,7 @@
                 }
             };
 
-            processCameraStart = function () {
+            processCameraStart = async function () {
 
                 var video = document.querySelector('video');
 
@@ -50,13 +55,13 @@
                 };
 
                 // Fired when camera has been mapped to the video.
-                function handleSuccess(stream) {
+                async function handleSuccess(stream) {
                     localMediaStream = stream;
                     video.srcObject = stream;
 
                     // When finished loading, start processing.
-                    video.onloadeddata = function () {
-                        processImage();
+                    video.onloadeddata = async function () {
+                        await processImage();
                     }
                 }
 
@@ -66,7 +71,7 @@
             };
 
 
-            processImage = function () {
+            processImage = async function () {
 
                 var canvas = document.createElement('canvas');
                 var video = document.querySelector('video');
@@ -98,12 +103,17 @@
 
                         console.log("Identified person : " + data);
 
-                        directLine.postActivity({
-                            type: 'event',
-                            name: 'facesAnalysed',
-                            from: { id: userId },
-                            value: data
-                        }).subscribe(function () { });
+                        // Could see someone. Extract ID and name.
+                        if (data && data!= '') {
+                            $("#msgInstruction").hide();
+                            var split = data.split(';');
+                            initialiseBot(split[0], split[1]);
+                        }
+                        // Couldn't see anyone.
+                        else {
+                            $("#msgInstruction").hide();
+                            $("#msgNoOneThere").show();
+                        }
 
                     })
 
@@ -150,7 +160,7 @@
 
             sendImageErrorToBot = function (error) {
 
-                directLine.postActivity({
+                _directLine.postActivity({
                     type: 'event',
                     name: 'faceError',
                     from: { id: userId },
@@ -158,40 +168,63 @@
                 }).subscribe(function () { });
             }
 
-            var res = await fetch('/api/directlinetoken', { method: 'POST' });
-            var resultObject = await res.json();
-            var directLineToken = resultObject.Token;
+            let _directLine;
+            let store;
+            let _userId;
+            let _userName;
 
-            var userId = resultObject.UserId;
+            initialiseBot = async function (userId, userName) {
 
-            var directLine = window.WebChat.createDirectLine({ token: directLineToken });
+                _userId = userId;
+                _userName = userName;
 
-            // For handling back-channel events from the bot.
-            const store = window.WebChat.createStore(
-                {},
-                ({ dispatch }) => next => action => {
+                var res = await fetch('/api/directlinetoken', { method: 'POST' });
+                var resultObject = await res.json();
+                var directLineToken = resultObject.Token;
 
-                    if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
+                _directLine = window.WebChat.createDirectLine({ token: directLineToken });
 
-                        const { activity } = action.payload;
+                // For handling back-channel events from the bot.
+                store = window.WebChat.createStore(
+                    {},
+                    ({ dispatch }) => next => action => {
 
-                        // When we get event for starting camera, start processing camera.
-                        if (activity.type === 'event' && activity.name === 'readyForCamera') {
-                            processCameraStart();
+                        // Handle events from bot.
+                        if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
+
+                            const { activity } = action.payload;
+
+                            // When we get event for starting camera, start processing camera.
+                            if (activity.type === 'event' && activity.name === 'readyForCamera') {
+                                processCameraStart();
+                            }
                         }
+
+                        return next(action);
                     }
+                );
 
-                    return next(action);
-                }
-            );
+                // Set up bot.
+                window.WebChat.renderWebChat({
+                    directLine: _directLine,
+                    user: { id: userId, name: userName },
+                    store
+                }, document.getElementById('webchat'));
 
-            // Set up bot.
-            window.WebChat.renderWebChat({
-                directLine: directLine,
-                store
-            }, document.getElementById('webchat'));
+                // Send event so bot greets user.
+                _directLine.postActivity({
+                    type: 'event',
+                    name: 'facesAnalysed',
+                    from: { id: _userId, name: _userName },
+                    value: _userName
+                }).subscribe(function () { });
 
-            document.querySelector('#webchat > *').focus();
+                document.querySelector('#webchat > *').focus();
+            }
+
+            await processCameraStart();
+
+
 
         })().catch(err => console.error(err));
 

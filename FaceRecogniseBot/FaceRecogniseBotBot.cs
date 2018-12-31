@@ -60,40 +60,18 @@ namespace FaceRecogniseBot
         /// <seealso cref="IMiddleware"/>
         public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
-            // Bot added to conversation. Send an event so the page fires up the camera.
-            if (turnContext.Activity.Type == ActivityTypes.ConversationUpdate)
+            // Echo back to the user whatever they typed.
+            if (turnContext.Activity.Type == ActivityTypes.Message)
             {
-                if (turnContext.Activity.MembersAdded.Any())
-                {
-                    if (turnContext.Activity.MembersAdded.First().Id.Contains("bot", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var eventAction = turnContext.Activity.CreateReply();
-                        eventAction.Type = ActivityTypes.Event;
-                        eventAction.Name = Constants.BotEvents.ReadyForCamera;
-                        await turnContext.SendActivityAsync(eventAction);
-                    }
-                }
-            }
-            else if (turnContext.Activity.Type == ActivityTypes.Message)
-            {
-                // Echo back to the user whatever they typed.
-                var responseMessage = $"You sent '{turnContext.Activity.Text}'\n";
+                var responseMessage = $"{turnContext.Activity.From.Name} said '{turnContext.Activity.Text}'\n";
                 await turnContext.SendActivityAsync(responseMessage);
             }
+            // Received event to start conversation.
             else if (turnContext.Activity.Type == ActivityTypes.Event)
             {
                 if (turnContext.Activity.Name == Constants.BotEvents.FacesAnalysed)
                 {
-                    var name = turnContext.Activity.Value.ToString();
-
-                    if(!string.IsNullOrWhiteSpace(name))
-                    {
-                        await turnContext.SendActivityAsync($"Welcome {name}!");
-                    }
-                    else
-                    {
-                        await turnContext.SendActivityAsync($"Is anyone there?");
-                    }
+                    await turnContext.SendActivityAsync($"Welcome {turnContext.Activity.From.Name}!");
                 }
             }
         }
