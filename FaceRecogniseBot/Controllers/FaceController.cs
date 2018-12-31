@@ -64,14 +64,14 @@ namespace FaceRecogniseBot.Controllers
                             largestFaceArea = faceArea;
                             mainFace = face;
                         }
-
-                        // At this point we've found a face but we don't know who it is.
-                        retVal = $"{Guid.NewGuid()};unknown person";
                     }
 
                     // Found a main face. Try to identify it.
                     if (mainFace != null)
                     {
+                        // At this point we've found a face but we don't know who it is.
+                        retVal = $"{Guid.NewGuid()};unknown person";
+
                         var identifyResult = await _faceClient.IdentifyAsync(_faceConfig.PersonGroupId, new Guid[] { mainFace.FaceId });
 
                         if(identifyResult.Length > 0)
