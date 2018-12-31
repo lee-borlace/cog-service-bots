@@ -11,6 +11,7 @@ namespace FaceRecogniseBot
         {
             public const string FacesAnalysed = "facesAnalysed";
             public const string FaceError = "faceError";
+            public const string ReadyForCamera = "readyForCamera";
         }
     }
 }

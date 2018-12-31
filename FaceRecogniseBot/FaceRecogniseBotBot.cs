@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
@@ -58,18 +60,25 @@ namespace FaceRecogniseBot
         /// <seealso cref="IMiddleware"/>
         public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
-            // Handle Message activity type, which is the main activity type for shown within a conversational interface
-            // Message activities may contain text, speech, interactive cards, and binary or unknown attachments.
-            // see https://aka.ms/about-bot-activity-message to learn more about the message and other activity types
-            if (turnContext.Activity.Type == ActivityTypes.Message)
+            // Bot added to conversation. Send an event so the page fires up the camera.
+            if (turnContext.Activity.Type == ActivityTypes.ConversationUpdate)
+            {
+                if (turnContext.Activity.MembersAdded.Any())
+                {
+                    if (turnContext.Activity.MembersAdded.First().Id.Contains("bot", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var eventAction = turnContext.Activity.CreateReply();
+                        eventAction.Type = ActivityTypes.Event;
+                        eventAction.Name = Constants.BotEvents.ReadyForCamera;
+                        await turnContext.SendActivityAsync(eventAction);
+                    }
+                }
+            }
+            else if (turnContext.Activity.Type == ActivityTypes.Message)
             {
                 // Echo back to the user whatever they typed.
                 var responseMessage = $"You sent '{turnContext.Activity.Text}'\n";
                 await turnContext.SendActivityAsync(responseMessage);
-            }
-            else
-            {
-                await turnContext.SendActivityAsync($"{turnContext.Activity.Type} event detected");
             }
         }
     }

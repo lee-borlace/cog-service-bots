@@ -10,5 +10,7 @@ namespace FaceRecogniseBot.Config
         public string ApiKey { get; set; }
 
         public string Region { get; set; }
+        
+        public string PersonGroupId { get; set; }
     }
 }
