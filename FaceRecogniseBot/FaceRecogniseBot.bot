@@ -1,0 +1,27 @@
+{
+    "name": "FaceRecogniseBot",
+    "description": "",
+    "services": [
+        {
+            "type": "endpoint",
+            "name": "development",
+            "endpoint": "http://localhost:3978/api/messages",
+            "appId": "13efa0d7-10b7-4ee6-b1eb-8f16f63642fa",
+            "appPassword": "HDbQw7nR74bo/L7xAU1+7w==!UHIrxMtpjuGOAUs0TQTLbe9Hl99H6014M7niZYVo0RM=",
+            "id": "1"
+        },
+        {
+            "type": "blob",
+            "name": "BotStateBlob",
+            "serviceName": "BotStateBlob",
+            "tenantId": "ebcdbb67-6ff1-452d-afcc-178934861a10",
+            "subscriptionId": "0a9a85bf-2d3c-47c6-bd3f-278487a44732",
+            "resourceGroup": "cog-service-bots",
+            "connectionString": "yXk26Uw4FVJpbx0hfA889w==!Y9hg1Tp7I1Azs1ZJ0/PZ2XbxWk0dNcx1t9qqhPRfZMI57sAjq/UwxcT3A6CFaTF78wY/T9SeDRtbch+nxZnWhlEska1q/t77I9Hien1zen0SUCiNFROqiLUI2dAGa9Eq97F1Hv7WefzjbNwNB31SSRf7x89/icqrbzKGMHdiYA3ITssGc1KBzicmxHL0bk6Yr3IQkKiexZ3WS6/QSM0P7h+6RPgvn7bAQvXsiIkn3Z/Y2yzUXM1XnA8XSetsyTfazjTTNQVUKJKIP0qUxm5vXQ==",
+            "container": "bot-state-facerecognisebot",
+            "id": "138"
+        }
+    ],
+    "padlock": "gip8j+DbcW+Oq2FOnrRKig==!u1eUABiJS7TMx4LYZ7c0zQn/RZRliDAx/sa9zsRUc8dgS1tuuwOWoZnEhEUgZ8I3",
+    "version": "2.0"
+}

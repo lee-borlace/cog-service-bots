@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FaceRecogniseBot", "FaceRecogniseBot\FaceRecogniseBot.csproj", "{037F1F94-08E5-4BE8-8DC1-F3037C34FAF3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISpyBot", "ISpyBot\ISpyBot\ISpyBot.csproj", "{E38A1A7E-F553-40F5-88A0-6CA53FB4E5FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{037F1F94-08E5-4BE8-8DC1-F3037C34FAF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{037F1F94-08E5-4BE8-8DC1-F3037C34FAF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{037F1F94-08E5-4BE8-8DC1-F3037C34FAF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{037F1F94-08E5-4BE8-8DC1-F3037C34FAF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E38A1A7E-F553-40F5-88A0-6CA53FB4E5FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E38A1A7E-F553-40F5-88A0-6CA53FB4E5FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E38A1A7E-F553-40F5-88A0-6CA53FB4E5FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E38A1A7E-F553-40F5-88A0-6CA53FB4E5FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1BD8D52F-9B59-4423-B4F7-C91730F4913C}
+	EndGlobalSection
+EndGlobal
