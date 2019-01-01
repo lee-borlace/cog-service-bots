@@ -7,6 +7,7 @@ namespace FaceRecogniseBot
 {
     public class FaceRecogniseBotState
     {
-        public string CurrentUser { get; set; }
+        public string CurrentUserId { get; set; }
+        public string CurrentUserName { get; set; }
     }
 }

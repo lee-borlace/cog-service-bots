@@ -60,10 +60,12 @@ namespace FaceRecogniseBot
         /// <seealso cref="IMiddleware"/>
         public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
+            var botState = await _accessors.FaceRecogniseBotState.GetAsync(turnContext, () => new FaceRecogniseBotState());
+
             // Echo back to the user whatever they typed.
             if (turnContext.Activity.Type == ActivityTypes.Message)
             {
-                var responseMessage = $"You said '{turnContext.Activity.Text}'\n";
+                var responseMessage = $"{botState.CurrentUserName} said '{turnContext.Activity.Text}'\n";
                 await turnContext.SendActivityAsync(responseMessage);
             }
             // Received event to start conversation.
@@ -71,7 +73,20 @@ namespace FaceRecogniseBot
             {
                 if (turnContext.Activity.Name == Constants.BotEvents.FacesAnalysed)
                 {
-                    await turnContext.SendActivityAsync($"Hi {turnContext.Activity.From.Name}!");
+                    // Persist user ID and name.
+                    var split = turnContext.Activity.Value.ToString().Split(";");
+
+                    if(split.Length == 2)
+                    {
+                        botState.CurrentUserId = split[0];
+                        botState.CurrentUserName = split[1];
+                        await _accessors.FaceRecogniseBotState.SetAsync(turnContext, botState);
+                        await _accessors.ConversationState.SaveChangesAsync(turnContext);
+
+                        await turnContext.SendActivityAsync($"Hi **{botState.CurrentUserName}**!");
+                    }
+
+                    
                 }
             }
         }

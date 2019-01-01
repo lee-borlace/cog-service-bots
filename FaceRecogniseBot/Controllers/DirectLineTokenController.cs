@@ -35,12 +35,11 @@ namespace FaceRecogniseBot.Controllers
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _directLineSecret);
             var userId = $"dl_{Guid.NewGuid()}";
 
-            // For now, ignore user ID part of token.
-            //request.Content = new StringContent(
-            //    JsonConvert.SerializeObject(
-            //        new { User = new { Id = userId } }),
-            //        Encoding.UTF8,
-            //        "application/json");
+            request.Content = new StringContent(
+                JsonConvert.SerializeObject(
+                    new { User = new { Id = userId } }),
+                    Encoding.UTF8,
+                    "application/json");
 
             var response = await client.SendAsync(request);
             string token = String.Empty;

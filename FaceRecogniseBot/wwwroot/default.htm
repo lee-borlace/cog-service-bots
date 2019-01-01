@@ -160,6 +160,7 @@
             let _userId = '';
             let _userName;
             let _botInitialised = false;
+            let _actualUserId = '';
 
             initialiseBotOnce = async function () {
 
@@ -170,13 +171,14 @@
                     var res = await fetch('/api/directlinetoken', { method: 'POST' });
                     var resultObject = await res.json();
                     var directLineToken = resultObject.Token;
-                    var conversationId = resultObject.ConversationId;
+                    _actualUserId = resultObject.UserId;
 
                     _directLine = window.WebChat.createDirectLine({ token: directLineToken });
 
                     // Set up bot.
                     window.WebChat.renderWebChat({
-                        directLine: _directLine
+                        directLine: _directLine,
+                        userID: _actualUserId
                     }, document.getElementById('webchat'));
 
                     document.querySelector('#webchat > *').focus();
@@ -188,8 +190,8 @@
                 _directLine.postActivity({
                     type: 'event',
                     name: 'facesAnalysed',
-                    from: { id: _userId, name: _userName },
-                    value: _userName
+                    from: { id: _actualUserId },
+                    value: _userId + ';' + _userName
                 }).subscribe(function () { });
             }
 
