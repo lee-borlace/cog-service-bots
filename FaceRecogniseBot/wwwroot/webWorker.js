@@ -1,4 +1,4 @@
-﻿var delay = 5000;
+﻿var delay = 2500;
 let _dataBlob;
 
 async function callFaceApi() {

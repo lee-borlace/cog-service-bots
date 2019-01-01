@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>I Spy Bot</title>
-    <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="https://unpkg.com/simple-update-in/dist/simple-update-in.production.min.js"></script>
+    <script src="/lib/webchat.js"></script>
+    <script src="/lib/jquery.min.js"></script>
+    <script src="/lib/simple-update-in.production.min.js"></script>
     <style>
         html, body {
             height: 100%
@@ -49,7 +49,7 @@
                 console.log("Identified person : " + event.data);
 
                 // Could see someone. Extract ID and name.
-                if (event.data && event.data!= '') {
+                if (event.data && event.data != '') {
 
                     $("#msgInstruction").hide();
                     $("#webchat").show();
@@ -61,10 +61,11 @@
                     // User ID has changed - re-initialise bot.
                     if (newUserId != _userId) {
 
-                        _directLine = null;
-                        $("#webchat").empty();
+                        _userId = newUserId;
+                        _userName = split[1];
 
-                        initialiseBot(newUserId, split[1]);
+                        await initialiseBotOnce();
+                        sendUserChangedEvent();
                     }
                 }
                 // Couldn't see anyone.
@@ -156,36 +157,40 @@
             }
 
             let _directLine;
-            let store;
             let _userId = '';
             let _userName;
+            let _botInitialised = false;
 
-            initialiseBot = async function (userId, userName) {
+            initialiseBotOnce = async function () {
 
-                _userId = userId;
-                _userName = userName;
+                if (!_botInitialised) {
 
-                var res = await fetch('/api/directlinetoken', { method: 'POST' });
-                var resultObject = await res.json();
-                var directLineToken = resultObject.Token;
+                    _botInitialised = true;
 
-                _directLine = window.WebChat.createDirectLine({ token: directLineToken });
+                    var res = await fetch('/api/directlinetoken', { method: 'POST' });
+                    var resultObject = await res.json();
+                    var directLineToken = resultObject.Token;
+                    var conversationId = resultObject.ConversationId;
 
-                // Set up bot.
-                window.WebChat.renderWebChat({
-                    directLine: _directLine,
-                    userID: userId,
-                }, document.getElementById('webchat'));
+                    _directLine = window.WebChat.createDirectLine({ token: directLineToken });
 
-                // Send event so bot greets user.
+                    // Set up bot.
+                    window.WebChat.renderWebChat({
+                        directLine: _directLine
+                    }, document.getElementById('webchat'));
+
+                    document.querySelector('#webchat > *').focus();
+                }
+            }
+
+            // Send event so bot greets user.
+            sendUserChangedEvent = function () {
                 _directLine.postActivity({
                     type: 'event',
                     name: 'facesAnalysed',
                     from: { id: _userId, name: _userName },
                     value: _userName
                 }).subscribe(function () { });
-
-                document.querySelector('#webchat > *').focus();
             }
 
             await processCameraStart();
