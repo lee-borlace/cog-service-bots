@@ -1,0 +1,27 @@
+{
+    "name": "WatcherBot",
+    "description": "",
+    "services": [
+        {
+            "type": "endpoint",
+            "name": "development",
+            "endpoint": "http://localhost:3978/api/messages",
+            "appId": "",
+            "appPassword": "",
+            "id": "1"
+        },
+        {
+            "type": "blob",
+            "name": "BotStateBlob",
+            "serviceName": "BotStateBlob",
+            "tenantId": "ebcdbb67-6ff1-452d-afcc-178934861a10",
+            "subscriptionId": "0a9a85bf-2d3c-47c6-bd3f-278487a44732",
+            "resourceGroup": "cog-service-bots",
+            "connectionString": "6OjCByGY1pq4RPl6/t9l7w==!eEdCJcGJ9ROr5tO67kWx6swVBqQ/9glCdXGcblv/aDGVRPsaaWHDc2C6tWu78Fi+FanQvFeCqY35BDFCEd6aHffJLGlnG3qNPIZlGN25754Kjk42hb1CjwFMe2WAgpPLgxAbMHDEP4iflmcDUEfLILTU0QpJ31NuWX9+EBzxi0UAYNeJcRfbDo5aT68STHKvd43CgWDGqxhgQM2B4JKsPuikAFHN9wzsYpqFrtiFyCuuydyhPm+aDfWkGH8yiDKCYk5QcDminBVVE+BXliggTg==",
+            "container": "bot-state-watcherbot",
+            "id": "145"
+        }
+    ],
+    "padlock": "jBf5dHRfA1IurKugWzEd9A==!FW+khP4yHaCroL4WA7lvbxcvLfCw8iI+UEMMf6Q9QPsKSczNFp4CNHmPsIQ2cO4U",
+    "version": "2.0"
+}
