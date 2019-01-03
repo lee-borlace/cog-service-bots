@@ -14,5 +14,7 @@ namespace Watcher.Config
         public string FaceSubscriptionKey { get; set; }
 
         public string FaceRegion { get; set; }
+
+        public string FacePersonGroupId { get; set; }
     }
 }
