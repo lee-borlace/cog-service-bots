@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Watcher.Config;
 
 namespace Watcher
 {
@@ -33,6 +34,9 @@ namespace Watcher
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddOptions();
+            services.Configure<WatcherConfig>(Configuration.GetSection("Watcher"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
