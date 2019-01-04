@@ -85,7 +85,15 @@ namespace Watcher.Controllers
                 var imageAnalysisTask = _visionClient.AnalyzeImageInStreamAsync(visionStream, VisionFeaturesToDetect);
 
                 // Kick off and wait for face analysis.
-                var faces = await _faceClient.DetectAsync(faceStream);
+                var faces = await _faceClient.DetectAsync(faceStream, returnFaceAttributes : new List<FaceAttributeType>() {
+                    FaceAttributeType.Age,
+                    FaceAttributeType.Emotion,
+                    FaceAttributeType.FacialHair,
+                    FaceAttributeType.Gender,
+                    FaceAttributeType.Glasses,
+                    FaceAttributeType.HeadPose,
+                    FaceAttributeType.Smile
+                });
 
                 observation.Faces = new Dictionary<Guid, Face>();
                 observation.FaceIdentifications = new Dictionary<Guid, List<IdentifyResult>>();
