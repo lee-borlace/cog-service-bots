@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Watcher.Config;
+using Watcher.Data;
 
 namespace Watcher
 {
@@ -37,6 +38,8 @@ namespace Watcher
 
             services.AddOptions();
             services.Configure<WatcherConfig>(Configuration.GetSection("Watcher"));
+
+            services.AddTransient<CosmosDataRepo, CosmosDataRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

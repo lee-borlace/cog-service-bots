@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.ProjectOxford.Face;
 using Microsoft.ProjectOxford.Face.Contract;
 using Watcher.Config;
+using Watcher.Data;
 using Watcher.Model;
 
 namespace Watcher.Controllers
@@ -22,6 +23,7 @@ namespace Watcher.Controllers
         private WatcherConfig _config;
         private FaceServiceClient _faceClient;
         private ComputerVisionClient _visionClient;
+        private CosmosDataRepo _dataRepo;
 
         private static readonly List<VisualFeatureTypes> VisionFeaturesToDetect =
            new List<VisualFeatureTypes>()
@@ -35,7 +37,9 @@ namespace Watcher.Controllers
             VisualFeatureTypes.Tags
        };
 
-        public ImageAnalysisController(IOptions<WatcherConfig> options)
+        public ImageAnalysisController(
+            IOptions<WatcherConfig> options,
+            CosmosDataRepo dataRepo)
         {
             _config = options.Value;
 
@@ -48,12 +52,14 @@ namespace Watcher.Controllers
                new System.Net.Http.DelegatingHandler[] { });
 
             _visionClient.Endpoint = $"https://{_config.CognitiveConfig.VisionRegion}.api.cognitive.microsoft.com";
+
+            _dataRepo = dataRepo;
         }
 
         [HttpPost("analyse")]
         public async Task<Observation> Analyse()
         {
-            var retVal = new Observation();
+            var observation = new Observation();
 
             try
             {
@@ -80,7 +86,7 @@ namespace Watcher.Controllers
 
                 // Once face analysis comes back, try to identify faces. TODO : This could be done in a more parallel async way to improve performance, but need to make sure we
                 // watch the total calls / sec for face API.
-                retVal.Faces = new Dictionary<Face, List<IdentifyResult>>();
+                observation.Faces = new Dictionary<Face, List<IdentifyResult>>();
 
                 if (faces != null && faces.Any())
                 {
@@ -101,12 +107,12 @@ namespace Watcher.Controllers
 
                             if (face != null)
                             {
-                                if (!retVal.Faces.ContainsKey(face))
+                                if (!observation.Faces.ContainsKey(face))
                                 {
-                                    retVal.Faces[face] = new List<IdentifyResult>();
+                                    observation.Faces[face] = new List<IdentifyResult>();
                                 }
 
-                                var identifyResultForFace = retVal.Faces[face];
+                                var identifyResultForFace = observation.Faces[face];
 
                                 identifyResultForFace.Add(faceIdentifyResult);
                             }
@@ -116,15 +122,16 @@ namespace Watcher.Controllers
                 }
 
                 // Make sure we've gotten the image analysis results.
-                retVal.ImageAnalysis = await imageAnalysisTask;
+                observation.ImageAnalysis = await imageAnalysisTask;
 
+                await _dataRepo.InsertObservation(observation);
             }
             catch (Exception ex)
             {
-                retVal.Exception = ex;
+                observation.Exception = ex;
             }
 
-            return retVal;
+            return observation;
         }
 
 
