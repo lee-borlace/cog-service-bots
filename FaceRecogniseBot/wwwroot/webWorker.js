@@ -1,10 +1,10 @@
-﻿var delay = 2500;
+﻿var delay = 5000;
 let _dataBlob;
 
 async function callFaceApi() {
 
     var apiResult = await fetch(
-        '/api/face/identifyMainFace',
+        '/api/face/analyse',
         {
             method: 'POST',
             headers: {

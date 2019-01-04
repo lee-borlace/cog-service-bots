@@ -46,7 +46,7 @@
             handleWebWorkerMessage = async function (event) {
                 webWorker.terminate();
 
-                console.log("Identified person : " + event.data);
+                console.log("Face analysis result : " + event.data);
 
                 // Could see someone. Extract ID and name.
                 if (event.data && event.data != '') {
@@ -66,6 +66,14 @@
 
                         await initialiseBotOnce();
                         sendUserChangedEvent();
+                    }
+
+                    // If emotion has changed, send an event to the bot.
+                    var newEmotion = split[2];
+
+                    if (_emotion != newEmotion && newEmotion && newEmotion != '') {
+                        _emotion = newEmotion;
+                        sendEmotionChangedEvent();
                     }
                 }
                 // Couldn't see anyone.
@@ -161,6 +169,7 @@
             let _userName;
             let _botInitialised = false;
             let _actualUserId = '';
+            let _emotion = '';
 
             initialiseBotOnce = async function () {
 
@@ -192,6 +201,16 @@
                     name: 'facesAnalysed',
                     from: { id: _actualUserId },
                     value: _userId + ';' + _userName
+                }).subscribe(function () { });
+            }
+
+            // Send event to indicate new emtion.
+            sendEmotionChangedEvent = function () {
+                _directLine.postActivity({
+                    type: 'event',
+                    name: 'newEmotion',
+                    from: { id: _actualUserId },
+                    value: _emotion
                 }).subscribe(function () { });
             }
 

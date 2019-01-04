@@ -9,5 +9,6 @@ namespace FaceRecogniseBot
     {
         public string CurrentUserId { get; set; }
         public string CurrentUserName { get; set; }
+        public string Emotion { get; set; }
     }
 }

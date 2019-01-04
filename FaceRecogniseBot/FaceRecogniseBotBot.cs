@@ -76,7 +76,7 @@ namespace FaceRecogniseBot
                     // Persist user ID and name.
                     var split = turnContext.Activity.Value.ToString().Split(";");
 
-                    if(split.Length == 2)
+                    if (split.Length == 2)
                     {
                         botState.CurrentUserId = split[0];
                         botState.CurrentUserName = split[1];
@@ -85,10 +85,65 @@ namespace FaceRecogniseBot
 
                         await turnContext.SendActivityAsync($"Hi **{botState.CurrentUserName}**!");
                     }
+                }
 
-                    
+                // Emotion detected. If it has changed, record it.
+                if (turnContext.Activity.Name == Constants.BotEvents.NewEmotion)
+                {
+                    var emotion = turnContext.Activity.Value.ToString();
+
+                    if(!string.IsNullOrEmpty(emotion))
+                    {
+                        if(emotion != botState.Emotion)
+                        {
+                            botState.Emotion = emotion;
+                            await _accessors.FaceRecogniseBotState.SetAsync(turnContext, botState);
+                            await _accessors.ConversationState.SaveChangesAsync(turnContext);
+
+                            _logger.LogInformation($"Emotion detected - **{emotion}**");
+
+                            var emotionMessage = GetEmotionMessage(emotion);
+
+                            if (!string.IsNullOrWhiteSpace(emotionMessage))
+                            {
+                                await turnContext.SendActivityAsync(emotionMessage);
+                            }
+                        }
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets a message suitable for the detected emtion.
+        /// </summary>
+        /// <param name="emotion">The emotion.</param>
+        /// <returns></returns>
+        private string GetEmotionMessage(string emotion)
+        {
+            var message = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(emotion))
+            {
+                switch(emotion.Trim().ToLower())
+                {
+                    case "anger":
+                    case "disgust":
+                    case "contempt":
+                    case "sadness":
+                        message = "You don't seem entirely pleased. Would you like to provide some feedback?";
+                        break;
+                    case "surprise":
+                    case "fear":
+                        message = "You seem like you need help. Would you like for me to explain what I can help you with?";
+                        break;
+                    case "happiness":
+                        message = "You seem happy! Would you like to leave a 5 star review?";
+                        break;
+                }
+            }
+
+            return message;
         }
     }
 }

@@ -32,21 +32,21 @@ namespace FaceRecogniseBot.Controllers
 
 
         /// <summary>
-        /// Returns {personId};{personName}
+        /// Returns {personId};{personName};{emotion}
         /// 
         /// If can't see anyone, returns blank.
         /// 
         /// </summary>
         /// <returns></returns>
-        [HttpPost("identifyMainFace")]
-        public async Task<string> IdentifyMainFace()
+        [HttpPost("analyse")]
+        public async Task<string> Analyse()
         {
             try
             {
                 var retVal = string.Empty;
 
                 // Detect faces in the image.
-                var faces = await _faceClient.DetectAsync(Request.Body);
+                var faces = await _faceClient.DetectAsync(Request.Body, returnFaceAttributes: new List<FaceAttributeType> { FaceAttributeType.Emotion });
 
                 // Iterate over the faces seen. Look for the one with the biggest area in the image. Take this as the main face for ID purposes.
                 if (faces != null && faces.Any())
@@ -69,8 +69,11 @@ namespace FaceRecogniseBot.Controllers
                     // Found a main face. Try to identify it.
                     if (mainFace != null)
                     {
+                        // Look for emotion.
+                        var emotion = GetEmotion(mainFace);
+
                         // At this point we've found a face but we don't know who it is.
-                        retVal = $"{Guid.NewGuid()};unknown person";
+                        retVal = $"{Guid.NewGuid()};unknown person;{emotion}";
 
                         var identifyResult = await _faceClient.IdentifyAsync(_faceConfig.PersonGroupId, new Guid[] { mainFace.FaceId });
 
@@ -82,7 +85,7 @@ namespace FaceRecogniseBot.Controllers
 
                                 if (_faceConfig.UserIdToNameMappings != null && _faceConfig.UserIdToNameMappings.ContainsKey(personId))
                                 {
-                                    retVal = $"{personId};{_faceConfig.UserIdToNameMappings[personId]}";
+                                    retVal = $"{personId};{_faceConfig.UserIdToNameMappings[personId]};{emotion}";
                                 }
                             }
                         }
@@ -96,6 +99,30 @@ namespace FaceRecogniseBot.Controllers
                 Trace.TraceError(ex.ToString());
                 return string.Empty;
             }
+        }
+
+        private string GetEmotion(Face face)
+        {
+            var MinimumEmotionConfidence = 0.8F;
+
+            var emotion = string.Empty;
+
+            if(face.FaceAttributes != null && face.FaceAttributes.Emotion != null)
+            {
+                var rankedEmotions = face.FaceAttributes.Emotion.ToRankedList();
+
+                if(rankedEmotions != null && rankedEmotions.Any())
+                {
+                    var strongestRankedEmotion = rankedEmotions.First();
+
+                    if(strongestRankedEmotion.Value >= MinimumEmotionConfidence)
+                    {
+                        emotion = strongestRankedEmotion.Key;
+                    }
+                }
+            }
+
+            return emotion;
         }
     }
 }
