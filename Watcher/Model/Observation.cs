@@ -13,6 +13,16 @@ namespace Watcher.Model
     public class Observation
     {
         /// <summary>
+        /// ID of camera that resulted in this observation.
+        /// </summary>
+        /// <value>
+        /// The camera identifier.
+        /// </value>
+        public string CameraId { get; set; }
+
+        public DateTime Timestamp { get; set; }
+
+        /// <summary>
         /// Results from image analysis.
         /// </summary>
         /// <value>

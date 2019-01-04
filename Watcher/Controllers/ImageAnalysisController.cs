@@ -62,6 +62,8 @@ namespace Watcher.Controllers
         {
             var observation = new Observation();
 
+            observation.Timestamp = DateTime.UtcNow;
+
             try
             {
                 // Duplicate the stream.
