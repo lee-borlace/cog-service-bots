@@ -34,7 +34,8 @@ namespace Watcher.Controllers
             VisualFeatureTypes.Description,
             VisualFeatureTypes.ImageType,
             VisualFeatureTypes.Objects,
-            VisualFeatureTypes.Tags
+            VisualFeatureTypes.Tags,
+            VisualFeatureTypes.Faces
        };
 
         public ImageAnalysisController(
@@ -84,12 +85,18 @@ namespace Watcher.Controllers
                 // Kick off and wait for face analysis.
                 var faces = await _faceClient.DetectAsync(faceStream);
 
-                // Once face analysis comes back, try to identify faces. TODO : This could be done in a more parallel async way to improve performance, but need to make sure we
-                // watch the total calls / sec for face API.
-                observation.Faces = new Dictionary<Face, List<IdentifyResult>>();
+                observation.Faces = new Dictionary<Guid, Face>();
+                observation.FaceIdentifications = new Dictionary<Guid, List<IdentifyResult>>();
+
 
                 if (faces != null && faces.Any())
                 {
+                    // Store info about each face.
+                    foreach(var face in faces)
+                    {
+                        observation.Faces[face.FaceId] = face;
+                    }
+
                     // All face IDs which came back.
                     var faceIds =
                         (from f in faces
@@ -98,24 +105,19 @@ namespace Watcher.Controllers
                     // Try to identify faces. First call the API.
                     var faceIdentifyResults = await _faceClient.IdentifyAsync(_config.CognitiveConfig.FacePersonGroupId, faceIds);
 
-                    // Go through results, map back to the faces we IDed initially. Add them to the Faces dictionary. Key is the face, value is the identification candidates.
+                    // Go through results, map back to the faces we IDed initially.
                     if (faceIdentifyResults != null)
                     {
                         foreach (var faceIdentifyResult in faceIdentifyResults)
                         {
-                            var face = faces.FirstOrDefault(f => f.FaceId == faceIdentifyResult.FaceId);
-
-                            if (face != null)
+                            if (!observation.FaceIdentifications.ContainsKey(faceIdentifyResult.FaceId))
                             {
-                                if (!observation.Faces.ContainsKey(face))
-                                {
-                                    observation.Faces[face] = new List<IdentifyResult>();
-                                }
-
-                                var identifyResultForFace = observation.Faces[face];
-
-                                identifyResultForFace.Add(faceIdentifyResult);
+                                observation.FaceIdentifications[faceIdentifyResult.FaceId] = new List<IdentifyResult>();
                             }
+
+                            var identifyResultForFace = observation.FaceIdentifications[faceIdentifyResult.FaceId];
+
+                            identifyResultForFace.Add(faceIdentifyResult);
                         }
                     }
 

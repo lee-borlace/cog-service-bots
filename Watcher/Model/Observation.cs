@@ -21,12 +21,20 @@ namespace Watcher.Model
         public ImageAnalysis ImageAnalysis { get; set; }
 
         /// <summary>
-        /// Information about faces detected. The key is a face identified in the image, the value is an array of face identification results.
+        /// Info about faces in image. Key is face ID and value is info about the face.
         /// </summary>
         /// <value>
         /// The faces.
         /// </value>
-        public Dictionary<Face, List<IdentifyResult>> Faces { get; set; }
+        public Dictionary<Guid, Face> Faces { get; set; }
+
+        /// <summary>
+        /// Info about identified faces. Key is face ID and value is identification candidates.
+        /// </summary>
+        /// <value>
+        /// The face identifications.
+        /// </value>
+        public Dictionary<Guid, List<IdentifyResult>> FaceIdentifications { get; set; }
 
         public Exception Exception { get; set; }
     }
