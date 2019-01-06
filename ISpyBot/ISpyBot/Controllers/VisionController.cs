@@ -22,7 +22,7 @@ namespace ISpyBot.Controllers
         private static readonly List<VisualFeatureTypes> Features =
             new List<VisualFeatureTypes>()
         {
-            VisualFeatureTypes.Tags
+            VisualFeatureTypes.Objects
         };
 
         public VisionController(IOptions<VisionConfig> options)

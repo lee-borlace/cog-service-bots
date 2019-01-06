@@ -78,23 +78,20 @@ namespace ISpyBot
             {
                 if(turnContext.Activity.Name == Constants.BotEvents.ImageAnalysed)
                 {
-                    // Clear out some not very useful tags for this game.
-                    var tagsToIgnore = new List<string>() { "indoor", "outdoor" };
-                    var tags = (turnContext.Activity.Value as JArray)?.ToObject<List<Tag>>();
-                    tags = tags.Where(t => !tagsToIgnore.Contains(t.Name)).ToList();
+                    var objects = (turnContext.Activity.Value as JArray)?.ToObject<List<VisionObject>>();
 
                     // If we're waiting for tags, then kick off the next dialog.
                     var botState = await _accessors.ISpyBotState.GetAsync(turnContext, () => new ISpyBotState());
                     if(botState.WaitingForTagsFromVision)
                     {
                         // Found at least one tag.
-                        if (tags.Count > 0)
+                        if (objects.Count > 0)
                         {
-                            var randomTagIndex = new Random(Guid.NewGuid().GetHashCode()).Next(0, tags.Count - 1);
+                            var randomTagIndex = new Random(Guid.NewGuid().GetHashCode()).Next(0, objects.Count - 1);
 
                             botState.WaitingForTagsFromVision = false;
                             botState.NumberOfGuesses = 0;
-                            botState.ObjectChosenByBot = tags[randomTagIndex].Name;
+                            botState.ObjectChosenByBot = objects[randomTagIndex].Obj.ToLower();
 
                             await _accessors.ISpyBotState.SetAsync(turnContext, botState);
                             await _accessors.ConversationState.SaveChangesAsync(turnContext);
@@ -117,7 +114,8 @@ namespace ISpyBot
 
         private async Task DoImageErrorMessage(ITurnContext turnContext)
         {
-
+            await turnContext.SendActivityAsync(Constants.Messages.CouldntFindAnything);
+            await turnContext.SendActivityAsync(Constants.Messages.PlayAgain);
         }
     }
 }

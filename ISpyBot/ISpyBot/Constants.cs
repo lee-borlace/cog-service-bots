@@ -11,12 +11,13 @@ namespace ISpyBot
         {
             public const string PromptPlayISpy = "Hi, would you like to play I Spy? I'll need to use your camera to play.";
             public const string DontPlay = "No worries, let me know if you'd like to play in future!";
-            public const string StartingCamera = "OK, let's start. Give me a second while I see what I can see. If you get prompted to let me use the camera, please select Yes!";
+            public const string StartingCamera = "OK, let's start. Give me a second while I see what I can see. If you get prompted to let me use the camera, please select Yes! Just type in your answer without any extra words e.g. **\"banana\"**.";
             public const string GotOne = "OK, got one!";
-            public const string ISpy = "I spy, with my little eye, something beginning with {0}.";
+            public const string ISpy = "I spy, with my little eye, something beginning with **{0}**.";
             public const string CouldntFindAnything = "Hmm, I'm having trouble seeing anything.";
-            public const string Correct = "That's right, it was {0}!";
-            public const string Incorrect = "Nope, it was {0}!";
+            public const string Correct = "That's right, it was **{0}**!";
+            public const string Incorrect = "Nope, it was **{0}**!";
+            public const string PlayAgain = "Say anything to restart the conversation and play again.";
         }
 
         public class InputHint

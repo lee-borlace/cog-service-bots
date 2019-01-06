@@ -104,17 +104,17 @@
 
                         console.log(data);
 
-                        var tags = [];
+                        var objects = [];
 
-                        if (data.tags) {
-                            tags = data.tags.map(tag => tag);
+                        if (data.objects) {
+                            objects = data.objects.map(object => object);
                         }
 
                         directLine.postActivity({
                             type: 'event',
                             name: 'imageAnalysed',
                             from: { id: userId },
-                            value: tags
+                            value: objects
                         }).subscribe(function () { });
 
                     })

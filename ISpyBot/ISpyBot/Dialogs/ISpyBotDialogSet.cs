@@ -128,6 +128,8 @@ namespace ISpyBot.Dialogs
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text(string.Format(Constants.Messages.Incorrect, botState.ObjectChosenByBot.Trim())), cancellationToken);
             }
 
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(Constants.Messages.PlayAgain), cancellationToken);
+
             return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);
         }
     }
