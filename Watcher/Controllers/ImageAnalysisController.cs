@@ -80,12 +80,12 @@ namespace Watcher.Controllers
                 Request.Body.CopyTo(visionStream);
                 visionStream.Seek(0, SeekOrigin.Begin);
                 Request.Body.Seek(0, SeekOrigin.Begin);
-               
+
                 // Kick off image analysis.
                 var imageAnalysisTask = _visionClient.AnalyzeImageInStreamAsync(visionStream, VisionFeaturesToDetect);
 
                 // Kick off and wait for face analysis.
-                var faces = await _faceClient.DetectAsync(faceStream, returnFaceAttributes : new List<FaceAttributeType>() {
+                var faces = await _faceClient.DetectAsync(faceStream, returnFaceAttributes: new List<FaceAttributeType>() {
                     FaceAttributeType.Age,
                     FaceAttributeType.Emotion,
                     FaceAttributeType.FacialHair,
@@ -102,7 +102,7 @@ namespace Watcher.Controllers
                 if (faces != null && faces.Any())
                 {
                     // Store info about each face.
-                    foreach(var face in faces)
+                    foreach (var face in faces)
                     {
                         observation.Faces[face.FaceId] = face;
                     }
@@ -147,5 +147,26 @@ namespace Watcher.Controllers
         }
 
 
+        /// <summary>
+        /// Gets a commentary based on the difference between two observations. 
+        /// </summary>
+        /// <param name="observations">The observations. Expects two elements. The first is the previous observation, the second is the current.</param>
+        /// <returns></returns>
+        [HttpPost("commentary")]
+        public async Task<string> Commentary([FromBody] Observation observation)
+        {
+            var retVal = string.Empty;
+
+            //if(observations == null || observations.Length != 2)
+            //{
+            //    return retVal;
+            //}
+
+            //retVal = Observation.GetCommentaryFromObservationDifferenceHtml(observations[0], observations[1]);
+
+            retVal = Observation.GetCommentaryFromObservationDifferenceHtml(observation, observation);
+
+            return retVal;
+        }
     }
 }

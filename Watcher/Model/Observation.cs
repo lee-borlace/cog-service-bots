@@ -3,6 +3,7 @@ using Microsoft.ProjectOxford.Face.Contract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Watcher.Model
@@ -47,5 +48,17 @@ namespace Watcher.Model
         public Dictionary<Guid, List<IdentifyResult>> FaceIdentifications { get; set; }
 
         public Exception Exception { get; set; }
+
+     
+        public static string GetCommentaryFromObservationDifferenceHtml(Observation lastObservation, Observation currentObservation)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine(DateTime.UtcNow.ToLongDateString());
+            sb.AppendLine("<br />");
+            sb.AppendLine("blah");
+
+            return sb.ToString();
+        }
     }
 }

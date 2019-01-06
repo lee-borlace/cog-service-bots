@@ -20,16 +20,41 @@
                 }
             };
 
-            let webWorker;
+            let webWorkerAnalysis;
+            let lastObservation = null;
+            let currentObservation = null;
 
             handleWebWorkerMessage = async function (event) {
-                webWorker.terminate();
+                webWorkerAnalysis.terminate();
 
                 console.log(event.data);
 
-                $("#analysisResult").text(JSON.stringify(event.data));
+                // Track previous and current observation.
+                lastObservation = currentObservation;
+                currentObservation = event.data;
+
+                // When the analysis result comes back, get the latest commentary and re-trigger the next round of analysis.
+                await getCommentary();
 
                 await processImage();
+            }
+
+            getCommentary = async function () {
+
+                var apiResult = await fetch(
+                    '/api/imageAnalysis/commentary',
+                    {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        //body: [lastObservation, currentObservation]
+                        body: currentObservation
+                    });
+
+                var textResult = await apiResult.text();
+
+                $("#analysisResult").text(textResult);
             }
 
             processCameraStart = async function () {
@@ -93,9 +118,9 @@
                 var dataUrl = canvas.toDataURL('image/jpeg');
 
                 // Reset web worker to deal with API.
-                webWorker = new Worker("js/webWorker.js");
-                webWorker.onmessage = handleWebWorkerMessage;
-                webWorker.postMessage({ dataBlob: makeblob(dataUrl) });
+                webWorkerAnalysis = new Worker("js/webWorkerAnalysis.js");
+                webWorkerAnalysis.onmessage = handleWebWorkerMessage;
+                webWorkerAnalysis.postMessage({ dataBlob: makeblob(dataUrl) });
             };
 
             await processCameraStart();
