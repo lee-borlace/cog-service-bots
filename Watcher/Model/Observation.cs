@@ -49,16 +49,93 @@ namespace Watcher.Model
 
         public Exception Exception { get; set; }
 
-     
-        public static string GetCommentaryFromObservationDifferenceHtml(Observation lastObservation, Observation currentObservation)
+        public ObservationDelta ObservationDelta { get; set; }
+
+        /// <summary>
+        /// Gets a list of names of identified people.
+        /// </summary>
+        /// <param name="userIdToNameMappings">The user identifier to name mappings.</param>
+        /// <returns></returns>
+        public List<string> GetIdentifiedPeopleList(Dictionary<string, string> userIdToNameMappings)
         {
-            var sb = new StringBuilder();
+            var retVal = new List<string>();
 
-            sb.AppendLine(DateTime.UtcNow.ToLongDateString());
-            sb.AppendLine("<br />");
-            sb.AppendLine("blah");
+            if (FaceIdentifications != null)
+            {
+                var personIds = from faceIdentification
+                           in FaceIdentifications.Values
+                           select faceIdentification.First().Candidates[0].PersonId;
 
-            return sb.ToString();
+                foreach (var personId in personIds)
+                {
+                    if(userIdToNameMappings.ContainsKey(personId.ToString()))
+                    {
+                        retVal.Add(userIdToNameMappings[personId.ToString()]);
+                    }
+                }
+            }
+
+            return retVal;
         }
+
+        private List<Guid> GetIdentifiedFaceIds()
+        {
+            var retVal = new List<Guid>();
+
+            if (FaceIdentifications != null)
+            {
+                retVal = FaceIdentifications.Keys.ToList();
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        /// Gets a list of descriptions of unidentified people.
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetUnidentifiedPeopleDescriptionList()
+        {
+            var retVal = new List<string>();
+
+            if (FaceIdentifications != null && Faces != null)
+            {
+                var identifiedFaceIds = GetIdentifiedFaceIds();
+
+                var unidentifiedFaceIds = Faces.Keys.Where(faceId => !identifiedFaceIds.Contains(faceId));
+
+                foreach (var unidentifiedFaceId in unidentifiedFaceIds)
+                {
+                    retVal.Add(GetPersonDescription(Faces[unidentifiedFaceId]));
+                }
+            }
+
+            return retVal;
+        }
+
+        public string GetPersonDescription(Face face)
+        {
+            return $"{face.FaceAttributes.Age} year old {face.FaceAttributes.Gender}.";
+        }
+
+        /// <summary>
+        /// Gets a list of objects.
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetObjectsList()
+        {
+            var retVal = new List<string>();
+
+            if (ImageAnalysis != null && ImageAnalysis.Objects != null)
+            {
+                retVal = (from o in ImageAnalysis.Objects
+                          select o.ObjectProperty).ToList();
+            }
+
+            return retVal;
+        }
+
+
+
     }
 }

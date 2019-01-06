@@ -21,40 +21,79 @@
             };
 
             let webWorkerAnalysis;
-            let lastObservation = null;
-            let currentObservation = null;
 
             handleWebWorkerMessage = async function (event) {
                 webWorkerAnalysis.terminate();
 
                 console.log(event.data);
 
-                // Track previous and current observation.
-                lastObservation = currentObservation;
-                currentObservation = event.data;
-
-                // When the analysis result comes back, get the latest commentary and re-trigger the next round of analysis.
-                await getCommentary();
+                if (event.data && event.data.observationDelta) {
+                    showDelta(event.data.observationDelta);
+                }
 
                 await processImage();
             }
 
-            getCommentary = async function () {
+            showDelta = function (delta) {
 
-                var apiResult = await fetch(
-                    '/api/imageAnalysis/commentary',
-                    {
-                        method: 'POST',
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        //body: [lastObservation, currentObservation]
-                        body: currentObservation
-                    });
+                console.log(delta);
 
-                var textResult = await apiResult.text();
+                var text = '';
+                var br = '<br/>';
 
-                $("#analysisResult").text(textResult);
+                text += new Date() + br;
+                text += '-------------' + br;
+
+                if (delta.identifiedPeopleAdded.length > 0) {
+                    text += '<strong>Added identified people:</strong>' + br;
+
+                    for (var i = 0; i < delta.identifiedPeopleAdded.length; i++) {
+                        text += delta.identifiedPeopleAdded[i] + br;
+                    }
+                }
+
+                if (delta.identifiedPeopleRemoved.length > 0) {
+                    text += '<strong>Removed identified people:</strong>' + br;
+
+                    for (var i = 0; i < delta.identifiedPeopleRemoved.length; i++) {
+                        text += delta.identifiedPeopleRemoved[i] + br;
+                    }
+                }
+
+                if (delta.unidentifiedPeopleAdded.length > 0) {
+                    text += '<strong>Added unidentified people:</strong>' + br;
+
+                    for (var i = 0; i < delta.unidentifiedPeopleAdded.length; i++) {
+                        text += delta.unidentifiedPeopleAdded[i] + br;
+                    }
+                }
+
+                if (delta.unidentifiedPeopleRemoved.length > 0) {
+                    text += '<strong>Removed unidentified people:</strong>' + br;
+
+                    for (var i = 0; i < delta.unidentifiedPeopleRemoved.length; i++) {
+                        text += delta.unidentifiedPeopleRemoved[i] + br;
+                    }
+                }
+
+                if (delta.objectsAdded.length > 0) {
+                    text += '<strong>Added objects:</strong>' + br;
+
+                    for (var i = 0; i < delta.objectsAdded.length; i++) {
+                        text += delta.objectsAdded[i] + br;
+                    }
+                }
+
+                if (delta.objectsRemoved.length > 0) {
+                    text += '<strong>Removed objects:</strong>' + br;
+
+                    for (var i = 0; i < delta.objectsRemoved.length; i++) {
+                        text += delta.objectsRemoved[i] + br;
+                    }
+                }
+
+                
+                $("#analysisResult").html(text);
             }
 
             processCameraStart = async function () {

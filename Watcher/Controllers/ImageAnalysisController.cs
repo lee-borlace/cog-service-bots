@@ -25,6 +25,9 @@ namespace Watcher.Controllers
         private ComputerVisionClient _visionClient;
         private CosmosDataRepo _dataRepo;
 
+        private static Observation _lastObservation;
+        private static Observation _currentObservation;
+
         private static readonly List<VisualFeatureTypes> VisionFeaturesToDetect =
            new List<VisualFeatureTypes>()
        {
@@ -136,6 +139,11 @@ namespace Watcher.Controllers
                 // Make sure we've gotten the image analysis results.
                 observation.ImageAnalysis = await imageAnalysisTask;
 
+                _lastObservation = _currentObservation;
+                _currentObservation = observation;
+
+                observation.ObservationDelta = ObservationDelta.CalculateDelta(_lastObservation, _currentObservation, _config.CognitiveConfig.UserIdToNameMappings);
+
                 await _dataRepo.InsertObservation(observation);
             }
             catch (Exception ex)
@@ -145,28 +153,6 @@ namespace Watcher.Controllers
 
             return observation;
         }
-
-
-        /// <summary>
-        /// Gets a commentary based on the difference between two observations. 
-        /// </summary>
-        /// <param name="observations">The observations. Expects two elements. The first is the previous observation, the second is the current.</param>
-        /// <returns></returns>
-        [HttpPost("commentary")]
-        public async Task<string> Commentary([FromBody] Observation observation)
-        {
-            var retVal = string.Empty;
-
-            //if(observations == null || observations.Length != 2)
-            //{
-            //    return retVal;
-            //}
-
-            //retVal = Observation.GetCommentaryFromObservationDifferenceHtml(observations[0], observations[1]);
-
-            retVal = Observation.GetCommentaryFromObservationDifferenceHtml(observation, observation);
-
-            return retVal;
-        }
+       
     }
 }
