@@ -21,6 +21,8 @@ namespace FaceRecogniseBot.Controllers
         private FaceConfig _faceConfig;
         private FaceServiceClient _faceClient;
 
+        private static Dictionary<Guid, Person> _personDictionary = new Dictionary<Guid, Person>();
+
         public FaceController(IOptions<FaceConfig> options)
         {
             _faceConfig = options.Value;
@@ -81,11 +83,28 @@ namespace FaceRecogniseBot.Controllers
                         {
                             if(identifyResult[0].Candidates != null && identifyResult[0].Candidates.Any())
                             {
-                                var personId = identifyResult[0].Candidates.First().PersonId.ToString();
+                                var personId = identifyResult[0].Candidates.First().PersonId;
 
-                                if (_faceConfig.UserIdToNameMappings != null && _faceConfig.UserIdToNameMappings.ContainsKey(personId))
+                                Person person = null;
+
+                                // Get and cache person.
+                                if (_personDictionary.ContainsKey(personId))
                                 {
-                                    retVal = $"{personId};{_faceConfig.UserIdToNameMappings[personId]};{emotion}";
+                                    person = _personDictionary[personId];
+                                }
+                                else
+                                {
+                                    person = await _faceClient.GetPersonAsync(_faceConfig.PersonGroupId, personId);
+
+                                    if(person != null)
+                                    {
+                                        _personDictionary[personId] = person;
+                                    }
+                                }
+
+                                if(person != null)
+                                {
+                                    retVal = $"{personId};{person.Name};{emotion}";
                                 }
                             }
                         }

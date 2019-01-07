@@ -12,7 +12,5 @@ namespace FaceRecogniseBot.Config
         public string Region { get; set; }
         
         public string PersonGroupId { get; set; }
-
-        public Dictionary<string, string> UserIdToNameMappings { get; set; }
     }
 }
