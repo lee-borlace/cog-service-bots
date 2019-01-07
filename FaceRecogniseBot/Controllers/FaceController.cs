@@ -23,6 +23,8 @@ namespace FaceRecogniseBot.Controllers
 
         private static Dictionary<Guid, Person> _personDictionary = new Dictionary<Guid, Person>();
 
+        private static string UnknownPersonId = Guid.NewGuid().ToString();
+
         public FaceController(IOptions<FaceConfig> options)
         {
             _faceConfig = options.Value;
@@ -75,7 +77,7 @@ namespace FaceRecogniseBot.Controllers
                         var emotion = GetEmotion(mainFace);
 
                         // At this point we've found a face but we don't know who it is.
-                        retVal = $"{Guid.NewGuid()};unknown person;{emotion}";
+                        retVal = $"{UnknownPersonId};unknown person;{emotion}";
 
                         var identifyResult = await _faceClient.IdentifyAsync(_faceConfig.PersonGroupId, new Guid[] { mainFace.FaceId });
 
