@@ -16,7 +16,5 @@ namespace Watcher.Config
         public string FaceRegion { get; set; }
 
         public string FacePersonGroupId { get; set; }
-
-        public Dictionary<string, string> UserIdToNameMappings { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.ProjectOxford.Face.Contract;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,10 +18,10 @@ namespace Watcher.Model
         public List<string> ObjectsAdded { get; set; }
         public List<string> ObjectsRemoved { get; set; }
 
-        public static ObservationDelta CalculateDelta(Observation previousObservation, Observation currentObservation, Dictionary<string, string> userIdToNameMappings)
+        public static ObservationDelta CalculateDelta(Observation previousObservation, Observation currentObservation, Dictionary<Guid, Person> personMappings)
         {
-            var identifiedPeoplePrevious = previousObservation != null ? previousObservation.GetIdentifiedPeopleList(userIdToNameMappings) : new List<string>();
-            var identifiedPeopleCurrent = currentObservation != null ? currentObservation.GetIdentifiedPeopleList(userIdToNameMappings) : new List<string>();
+            var identifiedPeoplePrevious = previousObservation != null ? previousObservation.GetIdentifiedPeopleList(personMappings) : new List<string>();
+            var identifiedPeopleCurrent = currentObservation != null ? currentObservation.GetIdentifiedPeopleList(personMappings) : new List<string>();
 
             var unidentifiedPeoplePrevious = previousObservation != null ? previousObservation.GetUnidentifiedPeopleDescriptionList() : new List<string>();
             var unidentifiedPeopleCurrent = currentObservation != null ? currentObservation.GetUnidentifiedPeopleDescriptionList() : new List<string>();

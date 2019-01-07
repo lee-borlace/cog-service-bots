@@ -28,6 +28,8 @@ namespace Watcher.Controllers
         private static Observation _lastObservation;
         private static Observation _currentObservation;
 
+        private static Dictionary<Guid, Person> _personDictionary = new Dictionary<Guid, Person>();
+
         private static readonly List<VisualFeatureTypes> VisionFeaturesToDetect =
            new List<VisualFeatureTypes>()
        {
@@ -118,6 +120,8 @@ namespace Watcher.Controllers
                     // Try to identify faces. First call the API.
                     var faceIdentifyResults = await _faceClient.IdentifyAsync(_config.CognitiveConfig.FacePersonGroupId, faceIds);
 
+                    var personIds = new List<Guid>();
+
                     // Go through results, map back to the faces we IDed initially.
                     if (faceIdentifyResults != null)
                     {
@@ -131,6 +135,17 @@ namespace Watcher.Controllers
                             var identifyResultForFace = observation.FaceIdentifications[faceIdentifyResult.FaceId];
 
                             identifyResultForFace.Add(faceIdentifyResult);
+
+                            personIds.Add(faceIdentifyResult.Candidates.First().PersonId);
+                        }
+                    }
+
+                    // Get info about any people we've encountered.
+                    foreach(var personId in personIds)
+                    {
+                        if(!_personDictionary.ContainsKey(personId))
+                        {
+                            _personDictionary[personId] = await _faceClient.GetPersonAsync(_config.CognitiveConfig.FacePersonGroupId, personId);
                         }
                     }
 
@@ -142,7 +157,7 @@ namespace Watcher.Controllers
                 _lastObservation = _currentObservation;
                 _currentObservation = observation;
 
-                observation.ObservationDelta = ObservationDelta.CalculateDelta(_lastObservation, _currentObservation, _config.CognitiveConfig.UserIdToNameMappings);
+                observation.ObservationDelta = ObservationDelta.CalculateDelta(_lastObservation, _currentObservation, _personDictionary);
 
                 await _dataRepo.InsertObservation(observation);
             }

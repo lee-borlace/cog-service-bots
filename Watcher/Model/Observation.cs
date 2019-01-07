@@ -54,9 +54,9 @@ namespace Watcher.Model
         /// <summary>
         /// Gets a list of names of identified people.
         /// </summary>
-        /// <param name="userIdToNameMappings">The user identifier to name mappings.</param>
+        /// <param name="personMappings">The user identifier to name mappings.</param>
         /// <returns></returns>
-        public List<string> GetIdentifiedPeopleList(Dictionary<string, string> userIdToNameMappings)
+        public List<string> GetIdentifiedPeopleList(Dictionary<Guid, Person> personMappings)
         {
             var retVal = new List<string>();
 
@@ -68,9 +68,9 @@ namespace Watcher.Model
 
                 foreach (var personId in personIds)
                 {
-                    if(userIdToNameMappings.ContainsKey(personId.ToString()))
+                    if(personMappings.ContainsKey(personId))
                     {
-                        retVal.Add(userIdToNameMappings[personId.ToString()]);
+                        retVal.Add(personMappings[personId].Name);
                     }
                 }
             }
