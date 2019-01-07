@@ -136,8 +136,28 @@ namespace Watcher.Controllers
 
                             identifyResultForFace.Add(faceIdentifyResult);
 
-                            personIds.Add(faceIdentifyResult.Candidates.First().PersonId);
+                            if (faceIdentifyResult.Candidates.Any())
+                            {
+                                personIds.Add(faceIdentifyResult.Candidates.First().PersonId);
+                            }
                         }
+                    }
+
+                    // Remove any faces which weren't identified.
+                    var faceIdsToRemove = new List<Guid>();
+                    foreach (var faceId in observation.FaceIdentifications.Keys)
+                    {
+                        var identifications = observation.FaceIdentifications[faceId];
+
+                        if (identifications == null || !identifications.Any() || !identifications.First().Candidates.Any())
+                        {
+                            faceIdsToRemove.Add(faceId);
+                        }
+                    }
+
+                    foreach(var faceId in faceIdsToRemove)
+                    {
+                        observation.FaceIdentifications.Remove(faceId);
                     }
 
                     // Get info about any people we've encountered.
