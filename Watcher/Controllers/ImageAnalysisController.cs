@@ -43,9 +43,27 @@ namespace Watcher.Controllers
             VisualFeatureTypes.Faces
        };
 
+        //public ImageAnalysisController(
+        //    IOptions<WatcherConfig> options,
+        //    CosmosDataRepo dataRepo)
+        //{
+        //    _config = options.Value;
+
+        //    _faceClient = new FaceServiceClient(
+        //        _config.CognitiveConfig.FaceSubscriptionKey,
+        //        $"https://{_config.CognitiveConfig.FaceRegion}.api.cognitive.microsoft.com/face/v1.0/");
+
+        //    _visionClient = new ComputerVisionClient(
+        //       new ApiKeyServiceClientCredentials(_config.CognitiveConfig.VisionSubscriptionKey),
+        //       new System.Net.Http.DelegatingHandler[] { });
+
+        //    _visionClient.Endpoint = $"https://{_config.CognitiveConfig.VisionRegion}.api.cognitive.microsoft.com";
+
+        //    _dataRepo = dataRepo;
+        //}
+
         public ImageAnalysisController(
-            IOptions<WatcherConfig> options,
-            CosmosDataRepo dataRepo)
+      IOptions<WatcherConfig> options)
         {
             _config = options.Value;
 
@@ -58,8 +76,6 @@ namespace Watcher.Controllers
                new System.Net.Http.DelegatingHandler[] { });
 
             _visionClient.Endpoint = $"https://{_config.CognitiveConfig.VisionRegion}.api.cognitive.microsoft.com";
-
-            _dataRepo = dataRepo;
         }
 
         [HttpPost("analyse")]
@@ -179,7 +195,7 @@ namespace Watcher.Controllers
 
                 observation.ObservationDelta = ObservationDelta.CalculateDelta(_lastObservation, _currentObservation, _personDictionary);
 
-                await _dataRepo.InsertObservation(observation);
+                // await _dataRepo.InsertObservation(observation);
             }
             catch (Exception ex)
             {

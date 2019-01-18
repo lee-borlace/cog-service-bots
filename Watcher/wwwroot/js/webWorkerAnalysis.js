@@ -1,4 +1,4 @@
-﻿var delay = 10000;
+﻿var delay = 50;
 let _dataBlob;
 
 async function analyse() {
